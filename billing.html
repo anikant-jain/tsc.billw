@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Street Café – Billing</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#1565C0;--blue-light:#1976D2;--blue-pale:#E3F2FD;
+  --green:#2E7D32;--green-light:#43A047;
+  --amber:#F57F17;--red:#C62828;
+  --bg:#F0F4F8;--surface:#fff;--sidebar:#1A237E;
+  --text:#1A1A2E;--muted:#607D8B;--border:#CFD8DC;
+  --radius:10px;
+}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+#sidebar{width:68px;background:var(--sidebar);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px;transition:width .25s;position:relative;z-index:10;}
+#sidebar .logo{color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;text-align:center;line-height:1.3;}
+.cat-btn{width:48px;height:48px;border:none;border-radius:var(--radius);background:transparent;color:rgba(255,255,255,.6);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Nunito',sans-serif;font-size:9px;font-weight:700;letter-spacing:.5px;transition:.2s;}
+.cat-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
+.cat-btn.active{background:var(--blue-light);color:#fff;}
+.cat-btn .icon{font-size:20px;line-height:1;}
+
+/* ── MENU PANEL ── */
+#menu-panel{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border);}
+#menu-header{padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
+#menu-header h1{font-size:18px;font-weight:800;color:var(--blue);}
+#menu-header .sub{font-size:12px;color:var(--muted);}
+#search-wrap{padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
+#search{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;color:var(--text);}
+#search:focus{border-color:var(--blue-light);}
+#cat-label{padding:8px 14px 4px;font-size:11px;font-weight:800;color:var(--blue);letter-spacing:1px;text-transform:uppercase;background:var(--bg);}
+#items-list{flex:1;overflow-y:auto;padding:6px 10px 10px;background:var(--bg);}
+#items-list::-webkit-scrollbar{width:4px;}
+#items-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.item-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;cursor:pointer;border:1.5px solid transparent;transition:.15s;}
+.item-row:hover{border-color:var(--blue-light);background:#EFF8FF;}
+.item-name{font-size:14px;font-weight:700;color:var(--text);}
+.item-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.item-price{font-size:15px;font-weight:800;color:var(--blue);white-space:nowrap;margin-left:10px;}
+.add-btn{width:28px;height:28px;border-radius:50%;border:none;background:var(--blue);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:8px;transition:.15s;}
+.add-btn:hover{background:var(--blue-light);}
+
+/* ── BILL PANEL ── */
+#bill-panel{width:360px;display:flex;flex-direction:column;background:var(--surface);}
+#bill-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
+#bill-header h2{font-size:17px;font-weight:800;color:var(--text);}
+#customer-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:#FAFBFC;}
+.info-field{display:flex;flex-direction:column;gap:3px;}
+.info-field label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;}
+.info-field input{padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text);outline:none;background:#fff;}
+.info-field input:focus{border-color:var(--blue-light);}
+#order-items{flex:1;overflow-y:auto;padding:8px 10px;}
+#order-items::-webkit-scrollbar{width:4px;}
+#order-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.empty-msg{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;}
+.empty-msg .big{font-size:36px;margin-bottom:8px;}
+.order-row{display:flex;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid #F5F5F5;}
+.order-name{flex:1;font-size:13px;font-weight:700;line-height:1.3;}
+.qty-controls{display:flex;align-items:center;gap:4px;}
+.qty-btn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--text);transition:.15s;}
+.qty-btn:hover{border-color:var(--blue-light);background:var(--blue-pale);}
+.qty-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;min-width:22px;text-align:center;}
+.row-total{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);min-width:52px;text-align:right;}
+.del-btn{width:22px;height:22px;border:none;background:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;transition:.15s;}
+.del-btn:hover{color:var(--red);}
+
+/* ── TOTALS ── */
+#totals{padding:10px 14px;border-top:1px solid var(--border);background:#FAFBFC;}
+.total-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--muted);}
+.total-row .val{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text);}
+.total-row.grand{font-size:16px;font-weight:800;color:var(--blue);border-top:2px dashed var(--border);padding-top:8px;margin-top:4px;}
+.total-row.grand .val{color:var(--blue);}
+#discount-row{display:flex;align-items:center;gap:8px;margin:6px 0 2px;}
+#discount-row label{font-size:12px;font-weight:700;color:var(--muted);}
+#discount-input{width:70px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;outline:none;color:var(--text);}
+#discount-input:focus{border-color:var(--blue-light);}
+#discount-row span{font-size:11px;color:var(--muted);}
+
+/* ── ACTIONS ── */
+#actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);}
+#btn-clear{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);transition:.2s;}
+#btn-clear:hover{border-color:var(--red);color:var(--red);}
+#btn-print{flex:2;padding:10px;border:none;background:var(--blue);border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;color:#fff;transition:.2s;}
+#btn-print:hover{background:var(--blue-light);}
+#btn-print:disabled{background:var(--border);cursor:default;}
+
+/* ── PRINT ── */
+@media print{
+  body{display:block;background:#fff;}
+  #sidebar,#menu-panel,#bill-panel{display:none!important;}
+  #print-receipt{display:block!important;}
+}
+#print-receipt{display:none;font-family:'JetBrains Mono',monospace;font-size:12px;width:300px;margin:0 auto;padding:16px;color:#000;}
+.r-center{text-align:center;}.r-bold{font-weight:700;}.r-big{font-size:16px;font-weight:700;}
+.r-line{border-top:1px dashed #000;margin:6px 0;}
+.r-row{display:flex;justify-content:space-between;}
+.r-item-name{flex:1;}.r-item-amt{min-width:55px;text-align:right;}
+.r-footer{text-align:center;margin-top:8px;font-size:10px;}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999;}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR CATEGORIES -->
+<div id="sidebar">
+  <div class="logo">TSC<br>POS</div>
+</div>
+
+<!-- MENU PANEL -->
+<div id="menu-panel">
+  <div id="menu-header">
+    <h1>☕ The Street Café</h1>
+    <div class="sub">Tap any item to add to bill</div>
+  </div>
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="Search menu…" oninput="filterItems(this.value)">
+  </div>
+  <div id="cat-label">All Items</div>
+  <div id="items-list"></div>
+</div>
+
+<!-- BILL PANEL -->
+<div id="bill-panel">
+  <div id="bill-header">
+    <h2>🧾 Current Bill</h2>
+  </div>
+  <div id="customer-info">
+    <div class="info-field">
+      <label>Customer</label>
+      <input id="cust-name" type="text" placeholder="Name">
+    </div>
+    <div class="info-field">
+      <label>Table / Token</label>
+      <input id="cust-table" type="text" placeholder="T1">
+    </div>
+    <div class="info-field">
+      <label>Phone</label>
+      <input id="cust-phone" type="text" placeholder="Optional">
+    </div>
+    <div class="info-field">
+      <label>Date &amp; Time</label>
+      <input id="cust-dt" type="text" readonly style="background:#F5F5F5;color:var(--muted);">
+    </div>
+  </div>
+  <div id="order-items">
+    <div class="empty-msg"><div class="big">🍽️</div>No items yet.<br>Tap menu items to add.</div>
+  </div>
+  <div id="totals">
+    <div class="total-row"><span>Subtotal</span><span class="val" id="t-sub">₹0.00</span></div>
+    <div id="discount-row">
+      <label>Discount ₹</label>
+      <input id="discount-input" type="number" min="0" value="0" oninput="updateTotals()">
+      <span>off bill</span>
+    </div>
+    <div class="total-row"><span>After Discount</span><span class="val" id="t-disc">₹0.00</span></div>
+    <div class="total-row"><span>GST (5%)</span><span class="val" id="t-gst">₹0.00</span></div>
+    <div class="total-row grand"><span>GRAND TOTAL</span><span class="val" id="t-grand">₹0.00</span></div>
+  </div>
+  <div id="actions">
+    <button id="btn-clear" onclick="clearBill()">🗑 Clear</button>
+    <button id="btn-print" onclick="printBill()" disabled>🖨 Print Bill</button>
+  </div>
+</div>
+
+<!-- PRINT RECEIPT -->
+<div id="print-receipt"></div>
+<div id="toast"></div>
+
+<script>
+const MENU = [
+  {cat:"🥪 Sandwich", items:[
+    {n:"Masala Sandwich",p:70},{n:"Veg Sandwich",p:80},{n:"Cheese Chutney",p:80},
+    {n:"Paneer Tandoori",p:90},{n:"Cheese & Corn",p:100},{n:"Bahubali",p:130}
+  ]},
+  {cat:"🥤 Shakes", items:[
+    {n:"Vanilla Shake",p:80},{n:"Chocolate Shake",p:90},{n:"Strawberry Shake",p:90},
+    {n:"Mango Shake",p:90},{n:"Rose Rabri Shake",p:90},{n:"Matka Kulfi Shake",p:110},
+    {n:"Kit Kat Shake",p:100},{n:"Choco Oreo Shake",p:100},{n:"Rasmalai Shake",p:110},{n:"Paan Fresh Shake",p:100}
+  ]},
+  {cat:"🍝 Maggi", items:[
+    {n:"Masala Maggi",p:50},{n:"Veg Masala Maggi",p:70},{n:"Cheese Maggi",p:80},
+    {n:"Peri Peri Maggi",p:80},{n:"Tandoori Maggi",p:90},{n:"Corn & Cheese Maggi",p:100}
+  ]},
+  {cat:"🍟 Fries", items:[
+    {n:"Regular Fries",p:90},{n:"Peri Peri Fries",p:100},{n:"Cheese Fries",p:130}
+  ]},
+  {cat:"⭐ TSC Specials", items:[
+    {n:"Potato Wedges",p:100},{n:"Peri Peri Wedges",p:110},{n:"Cheesy Wedges",p:140},
+    {n:"Chat Basket",p:85},{n:"Spring Roll",p:100},{n:"Indori Samosa",p:30}
+  ]},
+  {cat:"🍕 Pizza", items:[
+    {n:"Margareta Pizza",p:99},{n:"Onion Tomato Cap Pizza",p:140},{n:"Golden Corn Pizza",p:140},
+    {n:"Tandoori Paneer Pizza",p:150},{n:"Corn & Paneer Pizza",p:160}
+  ]},
+  {cat:"🍔 Burger", items:[
+    {n:"Aloo Tikki Burger",p:60},{n:"Veg Burger",p:80},{n:"Veg Cheese Burger",p:90},
+    {n:"Veg Tandoori Burger",p:90},{n:"Paneer Burger",p:100},{n:"Double Decker Burger",p:140}
+  ]},
+  {cat:"🥙 Sandwizza", items:[
+    {n:"Veg Loaded Sandwizza",p:100},{n:"Golden Corn Sandwizza",p:110},{n:"Onion Tomato Cap Sandwizza",p:120},
+    {n:"Tandoori Paneer Sandwizza",p:120},{n:"Paneer Cap Onion Sandwizza",p:110},
+    {n:"Paneer Corn & Cheese Sandwizza",p:140},{n:"Cheese Overloaded Sandwizza",p:150}
+  ]},
+  {cat:"🍹 Mojito", items:[
+    {n:"Virgin Wave Mojito",p:90},{n:"Cool Cucumber Mojito",p:90},{n:"Watermelon Mojito",p:100},
+    {n:"Blue Lagoon Mojito",p:100},{n:"Green Apple Mojito",p:100},{n:"Mango Mint Mojito",p:110},
+    {n:"Chilli Mint Mojito",p:100},{n:"Blue Magic Mojito",p:149}
+  ]},
+  {cat:"🍸 Coolers", items:[
+    {n:"Masala Lemonade",p:60},{n:"AAM Panna",p:60}
+  ]},
+  {cat:"🌮 Vada Pav", items:[
+    {n:"Bombay Vada Pav",p:50},{n:"Cheese Vada Pav",p:70}
+  ]},
+  {cat:"☕ Coffee", items:[
+    {n:"Hot Coffee",p:20},{n:"Cappuccino",p:40},{n:"Hot Chocolate",p:40},
+    {n:"Black Coffee",p:40},{n:"Cold Coffee",p:70}
+  ]},
+  {cat:"🥟 Momos (Steam)", items:[
+    {n:"Veg Momos (Steam)",p:80},{n:"Paneer Momos (Steam)",p:90},{n:"Cheese & Corn Momos (Steam)",p:100}
+  ]},
+  {cat:"🥟 Momos (Fry)", items:[
+    {n:"Veg Momos (Fry)",p:90},{n:"Paneer Momos (Fry)",p:100},{n:"Cheese & Corn Momos (Fry)",p:110}
+  ]},
+  {cat:"🥟 Momos (Kurkure)", items:[
+    {n:"Veg Momos (Kurkure)",p:110},{n:"Paneer Momos (Kurkure)",p:120},{n:"Cheese & Corn Momos (Kurkure)",p:140}
+  ]},
+];
+
+let order = [];
+let activeCat = null;
+
+/* Build sidebar */
+const sidebar = document.getElementById('sidebar');
+MENU.forEach((cat,i)=>{
+  const btn = document.createElement('button');
+  btn.className='cat-btn'+(i===0?' active':'');
+  const parts = cat.cat.split(' ');
+  const em = parts[0]; const label = parts.slice(1).join(' ');
+  btn.innerHTML=`<span class="icon">${em}</span><span>${label.substring(0,5)}</span>`;
+  btn.title = cat.cat;
+  btn.onclick=()=>{activeCat=i;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMenu();document.getElementById('search').value='';};
+  sidebar.appendChild(btn);
+});
+
+function renderMenu(filter=''){
+  const container=document.getElementById('items-list');
+  const catLabel=document.getElementById('cat-label');
+  container.innerHTML='';
+  const cats = filter ? MENU : (activeCat!==null?[MENU[activeCat]]:MENU);
+  if(activeCat!==null&&!filter) catLabel.textContent=MENU[activeCat].cat;
+  else catLabel.textContent='Search Results';
+  cats.forEach(cat=>{
+    const filteredItems=filter?cat.items.filter(it=>it.n.toLowerCase().includes(filter.toLowerCase())):cat.items;
+    if(!filteredItems.length) return;
+    if(filter){
+      const h=document.createElement('div');
+      h.style='font-size:10px;font-weight:800;color:var(--blue);letter-spacing:1px;padding:8px 4px 2px;text-transform:uppercase;';
+      h.textContent=cat.cat;container.appendChild(h);
+    }
+    filteredItems.forEach(item=>{
+      const row=document.createElement('div');row.className='item-row';
+      row.innerHTML=`<div><div class="item-name">${item.n}</div></div><div style="display:flex;align-items:center;"><span class="item-price">₹${item.p}</span><button class="add-btn" title="Add">+</button></div>`;
+      row.querySelector('.add-btn').onclick=(e)=>{e.stopPropagation();addItem(item);};
+      row.onclick=()=>addItem(item);
+      container.appendChild(row);
+    });
+  });
+}
+
+function filterItems(v){
+  if(!v.trim()){activeCat=activeCat||0;renderMenu();}
+  else{activeCat=null;renderMenu(v);}
+}
+
+function addItem(item){
+  const ex=order.find(o=>o.n===item.n);
+  if(ex){ex.qty++;}else{order.push({n:item.n,p:item.p,qty:1});}
+  renderOrder();toast(`Added: ${item.n}`);
+}
+
+function renderOrder(){
+  const container=document.getElementById('order-items');
+  const printBtn=document.getElementById('btn-print');
+  if(!order.length){container.innerHTML='<div class="empty-msg"><div class="big">🍽️</div>No items yet.<br>Tap menu items to add.</div>';printBtn.disabled=true;updateTotals();return;}
+  printBtn.disabled=false;
+  container.innerHTML='';
+  order.forEach((it,i)=>{
+    const row=document.createElement('div');row.className='order-row';
+    row.innerHTML=`<div class="order-name">${it.n}</div>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
+        <span class="qty-num">${it.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+      </div>
+      <span class="row-total">₹${(it.p*it.qty).toFixed(2)}</span>
+      <button class="del-btn" onclick="removeItem(${i})" title="Remove">×</button>`;
+    container.appendChild(row);
+  });
+  updateTotals();
+}
+
+function changeQty(i,d){
+  order[i].qty+=d;
+  if(order[i].qty<=0) order.splice(i,1);
+  renderOrder();
+}
+function removeItem(i){order.splice(i,1);renderOrder();}
+
+function updateTotals(){
+  const sub=order.reduce((s,it)=>s+it.p*it.qty,0);
+  const disc=Math.min(parseFloat(document.getElementById('discount-input').value)||0,sub);
+  const afterDisc=sub-disc;
+  const gst=afterDisc*0.05;
+  const grand=afterDisc+gst;
+  document.getElementById('t-sub').textContent=`₹${sub.toFixed(2)}`;
+  document.getElementById('t-disc').textContent=`₹${afterDisc.toFixed(2)}`;
+  document.getElementById('t-gst').textContent=`₹${gst.toFixed(2)}`;
+  document.getElementById('t-grand').textContent=`₹${grand.toFixed(2)}`;
+}
+
+function clearBill(){
+  if(!order.length&&!document.getElementById('cust-name').value) return;
+  if(confirm('Clear current bill?')){
+    order=[];
+    document.getElementById('cust-name').value='';
+    document.getElementById('cust-table').value='';
+    document.getElementById('cust-phone').value='';
+    document.getElementById('discount-input').value='0';
+    renderOrder();setDateTime();
+  }
+}
+
+function printBill(){
+  if(!order.length) return;
+  const name=document.getElementById('cust-name').value||'Walk-in';
+  const table=document.getElementById('cust-table').value||'—';
+  const phone=document.getElementById('cust-phone').value;
+  const dt=document.getElementById('cust-dt').value;
+  const sub=order.reduce((s,it)=>s+it.p*it.qty,0);
+  const disc=Math.min(parseFloat(document.getElementById('discount-input').value)||0,sub);
+  const afterDisc=sub-disc;
+  const gst=afterDisc*0.05;
+  const grand=afterDisc+gst;
+  const billNo='TSC-'+Date.now().toString().slice(-6);
+
+  let rows='';
+  order.forEach(it=>{
+    rows+=`<div class="r-row"><span class="r-item-name">${it.n} x${it.qty}</span><span class="r-item-amt">₹${(it.p*it.qty).toFixed(2)}</span></div>`;
+  });
+
+  document.getElementById('print-receipt').innerHTML=`
+  <div class="r-center r-big">★ THE STREET CAFÉ ★</div>
+  <div class="r-center" style="font-size:10px;">Shop No. 6, Shri Ram Complex A, B Road<br>Near Utsav Vatika, Pachore, MP</div>
+  <div class="r-center" style="font-size:10px;">Phone: 09999599997</div>
+  <div class="r-line"></div>
+  <div class="r-row"><span>Bill No:</span><span>${billNo}</span></div>
+  <div class="r-row"><span>Date:</span><span>${dt}</span></div>
+  <div class="r-row"><span>Customer:</span><span>${name}</span></div>
+  <div class="r-row"><span>Table:</span><span>${table}</span></div>
+  ${phone?`<div class="r-row"><span>Phone:</span><span>${phone}</span></div>`:''}
+  <div class="r-line"></div>
+  <div class="r-row r-bold"><span>Item</span><span>Amount</span></div>
+  <div class="r-line"></div>
+  ${rows}
+  <div class="r-line"></div>
+  <div class="r-row"><span>Subtotal</span><span>₹${sub.toFixed(2)}</span></div>
+  ${disc>0?`<div class="r-row"><span>Discount</span><span>-₹${disc.toFixed(2)}</span></div>`:''}
+  <div class="r-row"><span>GST (5%)</span><span>₹${gst.toFixed(2)}</span></div>
+  <div class="r-line"></div>
+  <div class="r-row r-bold" style="font-size:15px;"><span>TOTAL</span><span>₹${grand.toFixed(2)}</span></div>
+  <div class="r-line"></div>
+  <div class="r-footer">Thank you for visiting!<br>Fresh • Delicious • Refreshing<br>📲 wa.me/919999597107</div>
+  `;
+  window.print();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+function setDateTime(){
+  const now=new Date();
+  document.getElementById('cust-dt').value=now.toLocaleDateString('en-IN')+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+}
+
+/* INIT */
+activeCat=0;
+renderMenu();
+setDateTime();
+setInterval(setDateTime,60000);
+</script>
+</body>
+</html>
