@@ -89,18 +89,84 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 #btn-print:hover{background:var(--blue-light);}
 #btn-print:disabled{background:var(--border);cursor:default;}
 
-/* ── PRINT ── */
-@media print{
-  body{display:block;background:#fff;}
-  #sidebar,#menu-panel,#bill-panel{display:none!important;}
-  #print-receipt{display:block!important;}
+/* ══════════════════════════════════════════════════
+   PRINT STYLES — THERMAL RECEIPT FIX
+   Key fixes:
+   1. @page sets exact paper width (80mm thermal roll)
+      and auto height so printer knows where to STOP
+   2. margin: 0 removes all browser added white space
+   3. overflow: hidden prevents extra blank pages
+   4. page-break-after: avoid on receipt body
+   ══════════════════════════════════════════════════ */
+@media print {
+  /* Tell the printer: page is 80mm wide, height = content only */
+  @page {
+    size: 80mm auto;   /* width = thermal roll width; auto height = print stops when content ends */
+    margin: 0mm;       /* no browser margins — removes blank space that causes extra roll feed */
+  }
+
+  /* Hide the entire screen UI */
+  body {
+    display: block !important;
+    background: #fff !important;
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important; /* prevents extra blank page at end */
+  }
+
+  #sidebar,
+  #menu-panel,
+  #bill-panel {
+    display: none !important;
+  }
+
+  /* Show only the receipt */
+  #print-receipt {
+    display: block !important;
+    width: 76mm !important;       /* slight inset from 80mm roll edge */
+    margin: 0 auto !important;
+    padding: 4mm 2mm !important;
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 11pt !important;
+    color: #000 !important;
+    background: #fff !important;
+    page-break-after: avoid !important;  /* do NOT feed extra paper after last line */
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
+  }
+
+  /* Every element inside receipt: no page breaks inside items */
+  #print-receipt * {
+    page-break-inside: avoid !important;
+    orphans: 3;
+    widows: 3;
+  }
 }
-#print-receipt{display:none;font-family:'JetBrains Mono',monospace;font-size:12px;width:300px;margin:0 auto;padding:16px;color:#000;}
-.r-center{text-align:center;}.r-bold{font-weight:700;}.r-big{font-size:16px;font-weight:700;}
-.r-line{border-top:1px dashed #000;margin:6px 0;}
-.r-row{display:flex;justify-content:space-between;}
-.r-item-name{flex:1;}.r-item-amt{min-width:55px;text-align:right;}
-.r-footer{text-align:center;margin-top:8px;font-size:10px;}
+
+/* Screen preview of receipt (hidden on screen, shown on print) */
+#print-receipt {
+  display: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  width: 300px;
+  margin: 0 auto;
+  padding: 16px;
+  color: #000;
+  background: #fff;
+}
+
+/* Receipt element styles — used both on screen preview and in print */
+.r-center  { text-align: center; }
+.r-bold    { font-weight: 700; }
+.r-big     { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
+.r-line    { border: none; border-top: 1px dashed #000; margin: 5px 0; }
+.r-row     { display: flex; justify-content: space-between; margin: 1px 0; }
+.r-item-name { flex: 1; word-break: break-word; padding-right: 4px; }
+.r-item-amt  { min-width: 58px; text-align: right; white-space: nowrap; }
+.r-footer  { text-align: center; margin-top: 6px; font-size: 9pt; line-height: 1.5; }
+/* Extra blank feed gap at bottom (replaces manual roll cutting space) */
+.r-cut-space { height: 10mm; display: block; }
 
 /* ── TOAST ── */
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999;}
@@ -170,7 +236,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
   </div>
 </div>
 
-<!-- PRINT RECEIPT -->
+<!-- PRINT RECEIPT (hidden on screen, rendered for printing) -->
 <div id="print-receipt"></div>
 <div id="toast"></div>
 
@@ -354,13 +420,13 @@ function printBill(){
 
   let rows='';
   order.forEach(it=>{
-    rows+=`<div class="r-row"><span class="r-item-name">${it.n} x${it.qty}</span><span class="r-item-amt">₹${(it.p*it.qty).toFixed(2)}</span></div>`;
+    rows+=`<div class="r-row"><span class="r-item-name">${it.n} x${it.qty}</span><span class="r-item-amt">&#8377;${(it.p*it.qty).toFixed(2)}</span></div>`;
   });
 
   document.getElementById('print-receipt').innerHTML=`
-  <div class="r-center r-big">★ THE STREET CAFÉ ★</div>
-  <div class="r-center" style="font-size:10px;">Shop No. 6, Shri Ram Complex A, B Road<br>Near Utsav Vatika, Pachore, MP</div>
-  <div class="r-center" style="font-size:10px;">Phone: 09999599997</div>
+  <div class="r-center r-big">* THE STREET CAFE *</div>
+  <div class="r-center" style="font-size:9pt;margin-top:2px;">Shop No. 6, Shri Ram Complex A, B Road<br>Near Utsav Vatika, Pachore, MP</div>
+  <div class="r-center" style="font-size:9pt;">Ph: 09999599997</div>
   <div class="r-line"></div>
   <div class="r-row"><span>Bill No:</span><span>${billNo}</span></div>
   <div class="r-row"><span>Date:</span><span>${dt}</span></div>
@@ -368,19 +434,22 @@ function printBill(){
   <div class="r-row"><span>Table:</span><span>${table}</span></div>
   ${phone?`<div class="r-row"><span>Phone:</span><span>${phone}</span></div>`:''}
   <div class="r-line"></div>
-  <div class="r-row r-bold"><span>Item</span><span>Amount</span></div>
+  <div class="r-row r-bold"><span>Item</span><span>Amt</span></div>
   <div class="r-line"></div>
   ${rows}
   <div class="r-line"></div>
-  <div class="r-row"><span>Subtotal</span><span>₹${sub.toFixed(2)}</span></div>
-  ${disc>0?`<div class="r-row"><span>Discount</span><span>-₹${disc.toFixed(2)}</span></div>`:''}
-  <div class="r-row"><span>GST (5%)</span><span>₹${gst.toFixed(2)}</span></div>
+  <div class="r-row"><span>Subtotal</span><span>&#8377;${sub.toFixed(2)}</span></div>
+  ${disc>0?`<div class="r-row"><span>Discount</span><span>-&#8377;${disc.toFixed(2)}</span></div>`:''}
+  <div class="r-row"><span>GST (5%)</span><span>&#8377;${gst.toFixed(2)}</span></div>
   <div class="r-line"></div>
-  <div class="r-row r-bold" style="font-size:15px;"><span>TOTAL</span><span>₹${grand.toFixed(2)}</span></div>
+  <div class="r-row r-bold" style="font-size:13pt;"><span>TOTAL</span><span>&#8377;${grand.toFixed(2)}</span></div>
   <div class="r-line"></div>
-  <div class="r-footer">Thank you for visiting!<br>Fresh • Delicious • Refreshing<br>📲 wa.me/919999597107</div>
+  <div class="r-footer">Thank you for visiting!<br>Fresh * Delicious * Refreshing<br>wa.me/919999597107</div>
+  <div class="r-cut-space"></div>
   `;
-  window.print();
+
+  /* Short delay so DOM is painted before print dialog opens */
+  setTimeout(()=>{ window.print(); }, 80);
 }
 
 function toast(msg){
