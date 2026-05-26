@@ -1,472 +1,765 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Street Café – Billing</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{
-  --blue:#1565C0;--blue-light:#1976D2;--blue-pale:#E3F2FD;
-  --green:#2E7D32;--green-light:#43A047;
-  --amber:#F57F17;--red:#C62828;
-  --bg:#F0F4F8;--surface:#fff;--sidebar:#1A237E;
-  --text:#1A1A2E;--muted:#607D8B;--border:#CFD8DC;
-  --radius:10px;
-}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
-
-/* ── SIDEBAR ── */
-#sidebar{width:68px;background:var(--sidebar);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px;transition:width .25s;position:relative;z-index:10;}
-#sidebar .logo{color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;text-align:center;line-height:1.3;}
-.cat-btn{width:48px;height:48px;border:none;border-radius:var(--radius);background:transparent;color:rgba(255,255,255,.6);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:'Nunito',sans-serif;font-size:9px;font-weight:700;letter-spacing:.5px;transition:.2s;}
-.cat-btn:hover{background:rgba(255,255,255,.12);color:#fff;}
-.cat-btn.active{background:var(--blue-light);color:#fff;}
-.cat-btn .icon{font-size:20px;line-height:1;}
-
-/* ── MENU PANEL ── */
-#menu-panel{flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid var(--border);}
-#menu-header{padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);}
-#menu-header h1{font-size:18px;font-weight:800;color:var(--blue);}
-#menu-header .sub{font-size:12px;color:var(--muted);}
-#search-wrap{padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);}
-#search{width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;color:var(--text);}
-#search:focus{border-color:var(--blue-light);}
-#cat-label{padding:8px 14px 4px;font-size:11px;font-weight:800;color:var(--blue);letter-spacing:1px;text-transform:uppercase;background:var(--bg);}
-#items-list{flex:1;overflow-y:auto;padding:6px 10px 10px;background:var(--bg);}
-#items-list::-webkit-scrollbar{width:4px;}
-#items-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.item-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;cursor:pointer;border:1.5px solid transparent;transition:.15s;}
-.item-row:hover{border-color:var(--blue-light);background:#EFF8FF;}
-.item-name{font-size:14px;font-weight:700;color:var(--text);}
-.item-sub{font-size:11px;color:var(--muted);margin-top:1px;}
-.item-price{font-size:15px;font-weight:800;color:var(--blue);white-space:nowrap;margin-left:10px;}
-.add-btn{width:28px;height:28px;border-radius:50%;border:none;background:var(--blue);color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:8px;transition:.15s;}
-.add-btn:hover{background:var(--blue-light);}
-
-/* ── BILL PANEL ── */
-#bill-panel{width:360px;display:flex;flex-direction:column;background:var(--surface);}
-#bill-header{padding:14px 16px 10px;border-bottom:1px solid var(--border);}
-#bill-header h2{font-size:17px;font-weight:800;color:var(--text);}
-#customer-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:#FAFBFC;}
-.info-field{display:flex;flex-direction:column;gap:3px;}
-.info-field label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;}
-.info-field input{padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;color:var(--text);outline:none;background:#fff;}
-.info-field input:focus{border-color:var(--blue-light);}
-#order-items{flex:1;overflow-y:auto;padding:8px 10px;}
-#order-items::-webkit-scrollbar{width:4px;}
-#order-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
-.empty-msg{text-align:center;padding:40px 20px;color:var(--muted);font-size:14px;}
-.empty-msg .big{font-size:36px;margin-bottom:8px;}
-.order-row{display:flex;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid #F5F5F5;}
-.order-name{flex:1;font-size:13px;font-weight:700;line-height:1.3;}
-.qty-controls{display:flex;align-items:center;gap:4px;}
-.qty-btn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--text);transition:.15s;}
-.qty-btn:hover{border-color:var(--blue-light);background:var(--blue-pale);}
-.qty-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;min-width:22px;text-align:center;}
-.row-total{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);min-width:52px;text-align:right;}
-.del-btn{width:22px;height:22px;border:none;background:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;transition:.15s;}
-.del-btn:hover{color:var(--red);}
-
-/* ── TOTALS ── */
-#totals{padding:10px 14px;border-top:1px solid var(--border);background:#FAFBFC;}
-.total-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;color:var(--muted);}
-.total-row .val{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--text);}
-.total-row.grand{font-size:16px;font-weight:800;color:var(--blue);border-top:2px dashed var(--border);padding-top:8px;margin-top:4px;}
-.total-row.grand .val{color:var(--blue);}
-#discount-row{display:flex;align-items:center;gap:8px;margin:6px 0 2px;}
-#discount-row label{font-size:12px;font-weight:700;color:var(--muted);}
-#discount-input{width:70px;padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;outline:none;color:var(--text);}
-#discount-input:focus{border-color:var(--blue-light);}
-#discount-row span{font-size:11px;color:var(--muted);}
-
-/* ── ACTIONS ── */
-#actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);}
-#btn-clear{flex:1;padding:10px;border:1.5px solid var(--border);background:#fff;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);transition:.2s;}
-#btn-clear:hover{border-color:var(--red);color:var(--red);}
-#btn-print{flex:2;padding:10px;border:none;background:var(--blue);border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;color:#fff;transition:.2s;}
-#btn-print:hover{background:var(--blue-light);}
-#btn-print:disabled{background:var(--border);cursor:default;}
-
-/* ══════════════════════════════════════════════════
-   PRINT STYLES — THERMAL RECEIPT FIX
-   Key fixes:
-   1. @page sets exact paper width (80mm thermal roll)
-      and auto height so printer knows where to STOP
-   2. margin: 0 removes all browser added white space
-   3. overflow: hidden prevents extra blank pages
-   4. page-break-after: avoid on receipt body
-   ══════════════════════════════════════════════════ */
-@media print {
-  /* Tell the printer: page is 80mm wide, height = content only */
-  @page {
-    size: 80mm auto;   /* width = thermal roll width; auto height = print stops when content ends */
-    margin: 0mm;       /* no browser margins — removes blank space that causes extra roll feed */
-  }
-
-  /* Hide the entire screen UI */
-  body {
-    display: block !important;
-    background: #fff !important;
-    width: 80mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important; /* prevents extra blank page at end */
-  }
-
-  #sidebar,
-  #menu-panel,
-  #bill-panel {
-    display: none !important;
-  }
-
-  /* Show only the receipt */
-  #print-receipt {
-    display: block !important;
-    width: 76mm !important;       /* slight inset from 80mm roll edge */
-    margin: 0 auto !important;
-    padding: 4mm 2mm !important;
-    font-family: 'Courier New', Courier, monospace !important;
-    font-size: 11pt !important;
-    color: #000 !important;
-    background: #fff !important;
-    page-break-after: avoid !important;  /* do NOT feed extra paper after last line */
-    page-break-inside: avoid !important;
-    overflow: hidden !important;
-  }
-
-  /* Every element inside receipt: no page breaks inside items */
-  #print-receipt * {
-    page-break-inside: avoid !important;
-    orphans: 3;
-    widows: 3;
-  }
-}
-
-/* Screen preview of receipt (hidden on screen, shown on print) */
-#print-receipt {
-  display: none;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 12px;
-  width: 300px;
-  margin: 0 auto;
-  padding: 16px;
-  color: #000;
-  background: #fff;
-}
-
-/* Receipt element styles — used both on screen preview and in print */
-.r-center  { text-align: center; }
-.r-bold    { font-weight: 700; }
-.r-big     { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
-.r-line    { border: none; border-top: 1px dashed #000; margin: 5px 0; }
-.r-row     { display: flex; justify-content: space-between; margin: 1px 0; }
-.r-item-name { flex: 1; word-break: break-word; padding-right: 4px; }
-.r-item-amt  { min-width: 58px; text-align: right; white-space: nowrap; }
-.r-footer  { text-align: center; margin-top: 6px; font-size: 9pt; line-height: 1.5; }
-/* Extra blank feed gap at bottom (replaces manual roll cutting space) */
-.r-cut-space { height: 10mm; display: block; }
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999;}
-#toast.show{opacity:1;}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DigiRestro POS - Premium Restaurant Billing Software</title>
+  <!-- Google Fonts for Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- SIDEBAR CATEGORIES -->
-<div id="sidebar">
-  <div class="logo">TSC<br>POS</div>
-</div>
+  <!-- App Wrapper -->
+  <div class="app-container" id="appContainer">
 
-<!-- MENU PANEL -->
-<div id="menu-panel">
-  <div id="menu-header">
-    <h1>☕ The Street Café</h1>
-    <div class="sub">Tap any item to add to bill</div>
-  </div>
-  <div id="search-wrap">
-    <input id="search" type="text" placeholder="Search menu…" oninput="filterItems(this.value)">
-  </div>
-  <div id="cat-label">All Items</div>
-  <div id="items-list"></div>
-</div>
-
-<!-- BILL PANEL -->
-<div id="bill-panel">
-  <div id="bill-header">
-    <h2>🧾 Current Bill</h2>
-  </div>
-  <div id="customer-info">
-    <div class="info-field">
-      <label>Customer</label>
-      <input id="cust-name" type="text" placeholder="Name">
-    </div>
-    <div class="info-field">
-      <label>Table / Token</label>
-      <input id="cust-table" type="text" placeholder="T1">
-    </div>
-    <div class="info-field">
-      <label>Phone</label>
-      <input id="cust-phone" type="text" placeholder="Optional">
-    </div>
-    <div class="info-field">
-      <label>Date &amp; Time</label>
-      <input id="cust-dt" type="text" readonly style="background:#F5F5F5;color:var(--muted);">
-    </div>
-  </div>
-  <div id="order-items">
-    <div class="empty-msg"><div class="big">🍽️</div>No items yet.<br>Tap menu items to add.</div>
-  </div>
-  <div id="totals">
-    <div class="total-row"><span>Subtotal</span><span class="val" id="t-sub">₹0.00</span></div>
-    <div id="discount-row">
-      <label>Discount ₹</label>
-      <input id="discount-input" type="number" min="0" value="0" oninput="updateTotals()">
-      <span>off bill</span>
-    </div>
-    <div class="total-row"><span>After Discount</span><span class="val" id="t-disc">₹0.00</span></div>
-    <div class="total-row"><span>GST (5%)</span><span class="val" id="t-gst">₹0.00</span></div>
-    <div class="total-row grand"><span>GRAND TOTAL</span><span class="val" id="t-grand">₹0.00</span></div>
-  </div>
-  <div id="actions">
-    <button id="btn-clear" onclick="clearBill()">🗑 Clear</button>
-    <button id="btn-print" onclick="printBill()" disabled>🖨 Print Bill</button>
-  </div>
-</div>
-
-<!-- PRINT RECEIPT (hidden on screen, rendered for printing) -->
-<div id="print-receipt"></div>
-<div id="toast"></div>
-
-<script>
-const MENU = [
-  {cat:"🥪 Sandwich", items:[
-    {n:"Masala Sandwich",p:70},{n:"Veg Sandwich",p:80},{n:"Cheese Chutney",p:80},
-    {n:"Paneer Tandoori",p:90},{n:"Cheese & Corn",p:100},{n:"Bahubali",p:130}
-  ]},
-  {cat:"🥤 Shakes", items:[
-    {n:"Vanilla Shake",p:80},{n:"Chocolate Shake",p:90},{n:"Strawberry Shake",p:90},
-    {n:"Mango Shake",p:90},{n:"Rose Rabri Shake",p:90},{n:"Matka Kulfi Shake",p:110},
-    {n:"Kit Kat Shake",p:100},{n:"Choco Oreo Shake",p:100},{n:"Rasmalai Shake",p:110},{n:"Paan Fresh Shake",p:100}
-  ]},
-  {cat:"🍝 Maggi", items:[
-    {n:"Masala Maggi",p:50},{n:"Veg Masala Maggi",p:70},{n:"Cheese Maggi",p:80},
-    {n:"Peri Peri Maggi",p:80},{n:"Tandoori Maggi",p:90},{n:"Corn & Cheese Maggi",p:100}
-  ]},
-  {cat:"🍟 Fries", items:[
-    {n:"Regular Fries",p:90},{n:"Peri Peri Fries",p:100},{n:"Cheese Fries",p:130}
-  ]},
-  {cat:"⭐ TSC Specials", items:[
-    {n:"Potato Wedges",p:100},{n:"Peri Peri Wedges",p:110},{n:"Cheesy Wedges",p:140},
-    {n:"Chat Basket",p:85},{n:"Spring Roll",p:100},{n:"Indori Samosa",p:30}
-  ]},
-  {cat:"🍕 Pizza", items:[
-    {n:"Margareta Pizza",p:99},{n:"Onion Tomato Cap Pizza",p:140},{n:"Golden Corn Pizza",p:140},
-    {n:"Tandoori Paneer Pizza",p:150},{n:"Corn & Paneer Pizza",p:160}
-  ]},
-  {cat:"🍔 Burger", items:[
-    {n:"Aloo Tikki Burger",p:60},{n:"Veg Burger",p:80},{n:"Veg Cheese Burger",p:90},
-    {n:"Veg Tandoori Burger",p:90},{n:"Paneer Burger",p:100},{n:"Double Decker Burger",p:140}
-  ]},
-  {cat:"🥙 Sandwizza", items:[
-    {n:"Veg Loaded Sandwizza",p:100},{n:"Golden Corn Sandwizza",p:110},{n:"Onion Tomato Cap Sandwizza",p:120},
-    {n:"Tandoori Paneer Sandwizza",p:120},{n:"Paneer Cap Onion Sandwizza",p:110},
-    {n:"Paneer Corn & Cheese Sandwizza",p:140},{n:"Cheese Overloaded Sandwizza",p:150}
-  ]},
-  {cat:"🍹 Mojito", items:[
-    {n:"Virgin Wave Mojito",p:90},{n:"Cool Cucumber Mojito",p:90},{n:"Watermelon Mojito",p:100},
-    {n:"Blue Lagoon Mojito",p:100},{n:"Green Apple Mojito",p:100},{n:"Mango Mint Mojito",p:110},
-    {n:"Chilli Mint Mojito",p:100},{n:"Blue Magic Mojito",p:149}
-  ]},
-  {cat:"🍸 Coolers", items:[
-    {n:"Masala Lemonade",p:60},{n:"AAM Panna",p:60}
-  ]},
-  {cat:"🌮 Vada Pav", items:[
-    {n:"Bombay Vada Pav",p:50},{n:"Cheese Vada Pav",p:70}
-  ]},
-  {cat:"☕ Coffee", items:[
-    {n:"Hot Coffee",p:20},{n:"Cappuccino",p:40},{n:"Hot Chocolate",p:40},
-    {n:"Black Coffee",p:40},{n:"Cold Coffee",p:70}
-  ]},
-  {cat:"🥟 Momos (Steam)", items:[
-    {n:"Veg Momos (Steam)",p:80},{n:"Paneer Momos (Steam)",p:90},{n:"Cheese & Corn Momos (Steam)",p:100}
-  ]},
-  {cat:"🥟 Momos (Fry)", items:[
-    {n:"Veg Momos (Fry)",p:90},{n:"Paneer Momos (Fry)",p:100},{n:"Cheese & Corn Momos (Fry)",p:110}
-  ]},
-  {cat:"🥟 Momos (Kurkure)", items:[
-    {n:"Veg Momos (Kurkure)",p:110},{n:"Paneer Momos (Kurkure)",p:120},{n:"Cheese & Corn Momos (Kurkure)",p:140}
-  ]},
-];
-
-let order = [];
-let activeCat = null;
-
-/* Build sidebar */
-const sidebar = document.getElementById('sidebar');
-MENU.forEach((cat,i)=>{
-  const btn = document.createElement('button');
-  btn.className='cat-btn'+(i===0?' active':'');
-  const parts = cat.cat.split(' ');
-  const em = parts[0]; const label = parts.slice(1).join(' ');
-  btn.innerHTML=`<span class="icon">${em}</span><span>${label.substring(0,5)}</span>`;
-  btn.title = cat.cat;
-  btn.onclick=()=>{activeCat=i;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMenu();document.getElementById('search').value='';};
-  sidebar.appendChild(btn);
-});
-
-function renderMenu(filter=''){
-  const container=document.getElementById('items-list');
-  const catLabel=document.getElementById('cat-label');
-  container.innerHTML='';
-  const cats = filter ? MENU : (activeCat!==null?[MENU[activeCat]]:MENU);
-  if(activeCat!==null&&!filter) catLabel.textContent=MENU[activeCat].cat;
-  else catLabel.textContent='Search Results';
-  cats.forEach(cat=>{
-    const filteredItems=filter?cat.items.filter(it=>it.n.toLowerCase().includes(filter.toLowerCase())):cat.items;
-    if(!filteredItems.length) return;
-    if(filter){
-      const h=document.createElement('div');
-      h.style='font-size:10px;font-weight:800;color:var(--blue);letter-spacing:1px;padding:8px 4px 2px;text-transform:uppercase;';
-      h.textContent=cat.cat;container.appendChild(h);
-    }
-    filteredItems.forEach(item=>{
-      const row=document.createElement('div');row.className='item-row';
-      row.innerHTML=`<div><div class="item-name">${item.n}</div></div><div style="display:flex;align-items:center;"><span class="item-price">₹${item.p}</span><button class="add-btn" title="Add">+</button></div>`;
-      row.querySelector('.add-btn').onclick=(e)=>{e.stopPropagation();addItem(item);};
-      row.onclick=()=>addItem(item);
-      container.appendChild(row);
-    });
-  });
-}
-
-function filterItems(v){
-  if(!v.trim()){activeCat=activeCat||0;renderMenu();}
-  else{activeCat=null;renderMenu(v);}
-}
-
-function addItem(item){
-  const ex=order.find(o=>o.n===item.n);
-  if(ex){ex.qty++;}else{order.push({n:item.n,p:item.p,qty:1});}
-  renderOrder();toast(`Added: ${item.n}`);
-}
-
-function renderOrder(){
-  const container=document.getElementById('order-items');
-  const printBtn=document.getElementById('btn-print');
-  if(!order.length){container.innerHTML='<div class="empty-msg"><div class="big">🍽️</div>No items yet.<br>Tap menu items to add.</div>';printBtn.disabled=true;updateTotals();return;}
-  printBtn.disabled=false;
-  container.innerHTML='';
-  order.forEach((it,i)=>{
-    const row=document.createElement('div');row.className='order-row';
-    row.innerHTML=`<div class="order-name">${it.n}</div>
-      <div class="qty-controls">
-        <button class="qty-btn" onclick="changeQty(${i},-1)">−</button>
-        <span class="qty-num">${it.qty}</span>
-        <button class="qty-btn" onclick="changeQty(${i},1)">+</button>
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <button class="icon-btn sidebar-toggle" id="sidebarToggleBtn" aria-label="Toggle Sidebar">
+          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <span class="active-title" id="activeViewTitle">DINE IN</span>
       </div>
-      <span class="row-total">₹${(it.p*it.qty).toFixed(2)}</span>
-      <button class="del-btn" onclick="removeItem(${i})" title="Remove">×</button>`;
-    container.appendChild(row);
-  });
-  updateTotals();
-}
 
-function changeQty(i,d){
-  order[i].qty+=d;
-  if(order[i].qty<=0) order.splice(i,1);
-  renderOrder();
-}
-function removeItem(i){order.splice(i,1);renderOrder();}
+      <!-- Main Navigation Tabs -->
+      <nav class="header-tabs">
+        <button class="tab-link active" data-view="dine-in" id="navDineIn">DINE IN</button>
+        <button class="tab-link" data-view="take-away" id="navTakeAway">TAKE AWAY</button>
+        <button class="tab-link" data-view="door-delivery" id="navDoorDelivery">DOOR DELIVERY</button>
+        <button class="tab-link" data-view="online-orders" id="navOnlineOrders">
+          ONLINE ORDERS <span class="badge" id="onlineOrdersBadge">0</span>
+        </button>
+        <button class="tab-link" data-view="pending-orders" id="navPendingOrders">PENDING ORDERS</button>
+      </nav>
 
-function updateTotals(){
-  const sub=order.reduce((s,it)=>s+it.p*it.qty,0);
-  const disc=Math.min(parseFloat(document.getElementById('discount-input').value)||0,sub);
-  const afterDisc=sub-disc;
-  const gst=afterDisc*0.05;
-  const grand=afterDisc+gst;
-  document.getElementById('t-sub').textContent=`₹${sub.toFixed(2)}`;
-  document.getElementById('t-disc').textContent=`₹${afterDisc.toFixed(2)}`;
-  document.getElementById('t-gst').textContent=`₹${gst.toFixed(2)}`;
-  document.getElementById('t-grand').textContent=`₹${grand.toFixed(2)}`;
-}
+      <!-- Right Header Actions -->
+      <div class="header-right">
+        <!-- Online Toggle Switch -->
+        <label class="switch-container">
+          <input type="checkbox" checked id="onlineToggle">
+          <span class="slider"></span>
+        </label>
+        
+        <!-- Connection Status -->
+        <div class="status-indicator online" title="Status: Online" id="statusIndicator">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="wifi-icon"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20" stroke-linecap="round" stroke-width="4"></line></svg>
+        </div>
 
-function clearBill(){
-  if(!order.length&&!document.getElementById('cust-name').value) return;
-  if(confirm('Clear current bill?')){
-    order=[];
-    document.getElementById('cust-name').value='';
-    document.getElementById('cust-table').value='';
-    document.getElementById('cust-phone').value='';
-    document.getElementById('discount-input').value='0';
-    renderOrder();setDateTime();
-  }
-}
+        <!-- User Profile Dropdown -->
+        <div class="profile-dropdown" id="profileDropdownBtn">
+          <div class="profile-avatar">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          </div>
+          <span class="username" id="usernameDisplay">Toodo</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
 
-function printBill(){
-  if(!order.length) return;
-  const name=document.getElementById('cust-name').value||'Walk-in';
-  const table=document.getElementById('cust-table').value||'—';
-  const phone=document.getElementById('cust-phone').value;
-  const dt=document.getElementById('cust-dt').value;
-  const sub=order.reduce((s,it)=>s+it.p*it.qty,0);
-  const disc=Math.min(parseFloat(document.getElementById('discount-input').value)||0,sub);
-  const afterDisc=sub-disc;
-  const gst=afterDisc*0.05;
-  const grand=afterDisc+gst;
-  const billNo='TSC-'+Date.now().toString().slice(-6);
+        <!-- Notification Badge -->
+        <button class="icon-btn notification-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="notification-badge">2</span>
+        </button>
 
-  let rows='';
-  order.forEach(it=>{
-    rows+=`<div class="r-row"><span class="r-item-name">${it.n} x${it.qty}</span><span class="r-item-amt">&#8377;${(it.p*it.qty).toFixed(2)}</span></div>`;
-  });
+        <!-- More Option -->
+        <button class="icon-btn more-btn" aria-label="More Settings">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+        </button>
+      </div>
+    </header>
 
-  document.getElementById('print-receipt').innerHTML=`
-  <div class="r-center r-big">* THE STREET CAFE *</div>
-  <div class="r-center" style="font-size:9pt;margin-top:2px;">Shop No. 6, Shri Ram Complex A, B Road<br>Near Utsav Vatika, Pachore, MP</div>
-  <div class="r-center" style="font-size:9pt;">Ph: 09999599997</div>
-  <div class="r-line"></div>
-  <div class="r-row"><span>Bill No:</span><span>${billNo}</span></div>
-  <div class="r-row"><span>Date:</span><span>${dt}</span></div>
-  <div class="r-row"><span>Customer:</span><span>${name}</span></div>
-  <div class="r-row"><span>Table:</span><span>${table}</span></div>
-  ${phone?`<div class="r-row"><span>Phone:</span><span>${phone}</span></div>`:''}
-  <div class="r-line"></div>
-  <div class="r-row r-bold"><span>Item</span><span>Amt</span></div>
-  <div class="r-line"></div>
-  ${rows}
-  <div class="r-line"></div>
-  <div class="r-row"><span>Subtotal</span><span>&#8377;${sub.toFixed(2)}</span></div>
-  ${disc>0?`<div class="r-row"><span>Discount</span><span>-&#8377;${disc.toFixed(2)}</span></div>`:''}
-  <div class="r-row"><span>GST (5%)</span><span>&#8377;${gst.toFixed(2)}</span></div>
-  <div class="r-line"></div>
-  <div class="r-row r-bold" style="font-size:13pt;"><span>TOTAL</span><span>&#8377;${grand.toFixed(2)}</span></div>
-  <div class="r-line"></div>
-  <div class="r-footer">Thank you for visiting!<br>Fresh * Delicious * Refreshing<br>wa.me/919999597107</div>
-  <div class="r-cut-space"></div>
-  `;
+    <!-- Slide-Out Sidebar Menu Drawer -->
+    <aside class="sidebar-drawer" id="sidebarDrawer">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <span class="brand-text">DIGIRESTRO</span>
+        </div>
+        <div class="sidebar-license">
+          <span class="license-date">28/02/2029 (2260) days</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="license-icon"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </div>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <button class="menu-item active" data-target="dine-in" id="menuHome">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
+          <span class="menu-label">Home</span>
+        </button>
+        <button class="menu-item" data-target="pending-orders" id="menuAllOrder">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+          </span>
+          <span class="menu-label">All Order</span>
+        </button>
+        <button class="menu-item" data-target="sales-summary" id="menuSalesSummary">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          </span>
+          <span class="menu-label">Sales Summary</span>
+        </button>
+        <button class="menu-item" data-target="online-orders" id="menuAggregator">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+          </span>
+          <span class="menu-label">Aggregator</span>
+        </button>
+        <button class="menu-item" data-target="take-away" id="menuTakeAway">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 18.36L12 12l-6.36 6.36M12 12V3"></path></svg>
+          </span>
+          <span class="menu-label">Take Away</span>
+        </button>
+        <button class="menu-item" data-target="door-delivery" id="menuDoorDelivery">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>
+          </span>
+          <span class="menu-label">Door Delivery</span>
+        </button>
+        <button class="menu-item" data-target="dine-in" id="menuDineIn">
+          <span class="menu-icon">
+            <!-- Fork & Spoon -->
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M12 2v20"></path></svg>
+          </span>
+          <span class="menu-label">Dine-in Orders</span>
+        </button>
+        <button class="menu-item" id="menuStatus">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+          </span>
+          <span class="menu-label">Menu Status</span>
+        </button>
+        <button class="menu-item" id="menuExpense">
+          <span class="menu-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </span>
+          <span class="menu-label">Expense</span>
+        </button>
+      </nav>
+    </aside>
 
-  /* Short delay so DOM is painted before print dialog opens */
-  setTimeout(()=>{ window.print(); }, 80);
-}
+    <!-- Main View Workspace Area -->
+    <main class="main-workspace" id="mainWorkspace">
 
-function toast(msg){
-  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),1500);
-}
+      <!-- ==================== VIEW: DINE IN ==================== -->
+      <section class="viewport-section active" id="viewDineIn">
+        <!-- Area Selector Tabs -->
+        <div class="area-selector-bar">
+          <button class="area-btn active" data-area="ground">GROUND</button>
+          <button class="area-btn" data-area="floor">FLOOR</button>
+          <button class="area-btn" data-area="vip">VIP</button>
+          <button class="area-btn" data-area="garden">GARDEN</button>
+          <button class="area-btn" data-area="ac">AC</button>
+          <button class="area-btn" data-area="bar">BAR</button>
+          <button class="area-btn" data-area="testab">TESTAB</button>
+        </div>
 
-function setDateTime(){
-  const now=new Date();
-  document.getElementById('cust-dt').value=now.toLocaleDateString('en-IN')+' '+now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-}
+        <!-- Tables Grid Layout -->
+        <div class="tables-grid" id="tablesGrid">
+          <!-- Dynamically populated via app.js -->
+        </div>
+      </section>
 
-/* INIT */
-activeCat=0;
-renderMenu();
-setDateTime();
-setInterval(setDateTime,60000);
-</script>
+      <!-- ==================== VIEW: TAKE AWAY ==================== -->
+      <section class="viewport-section" id="viewTakeAway">
+        <div class="orders-management-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+          <h3 class="view-subtitle" style="font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif;">Active Take Away Orders</h3>
+          <button class="modal-btn btn-success" id="btnNewTakeAway" style="flex: none; padding: 10px 20px; font-size: 13.5px; border-radius: 8px;">
+            + NEW TAKE AWAY ORDER
+          </button>
+        </div>
+        <!-- Active Take Away Orders Grid -->
+        <div class="tables-grid" id="takeAwayGrid">
+          <!-- Dynamically populated via app.js -->
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: DOOR DELIVERY ==================== -->
+      <section class="viewport-section" id="viewDoorDelivery">
+        <div class="orders-management-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+          <h3 class="view-subtitle" style="font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif;">Active Door Delivery Orders</h3>
+          <button class="modal-btn btn-success" id="btnNewDoorDelivery" style="flex: none; padding: 10px 20px; font-size: 13.5px; border-radius: 8px;">
+            + NEW DOOR DELIVERY ORDER
+          </button>
+        </div>
+        <!-- Active Door Delivery Orders Grid -->
+        <div class="tables-grid" id="doorDeliveryGrid">
+          <!-- Dynamically populated via app.js -->
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: POS TERMINAL ==================== -->
+      <section class="viewport-section" id="viewPOS">
+        <div class="pos-layout">
+          <!-- Left side: Category, Search and Food Items -->
+          <div class="pos-items-panel">
+            <!-- Search & Filter Bar -->
+            <div class="pos-search-header">
+              <div class="search-input-wrapper">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" placeholder="Search Item Name (Ex: Aloo Gobi), Press ESC To Clear" id="menuSearchInput">
+              </div>
+            </div>
+
+            <div class="pos-main-body">
+              <!-- Menu Categories Left Sidebar -->
+              <div class="categories-list" id="categoriesContainer">
+                <!-- Dynamically populated, items styled with red indicators -->
+              </div>
+
+              <!-- Menu Grid -->
+              <div class="menu-items-grid-container">
+                <div class="menu-items-grid" id="menuItemsGrid">
+                  <!-- Dynamically populated items -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right side: POS Cart / Ticket -->
+          <div class="pos-cart-panel">
+            <!-- Cart Header Badges -->
+            <div class="cart-summary-header">
+              <div class="summary-badge-item text-bold">
+                <span class="badge-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+                </span>
+                <span id="cartTableLabel">Table : 1</span>
+              </div>
+              <div class="summary-badge-item">
+                <span class="badge-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                </span>
+                <span id="cartServiceLabel">Dine In</span>
+              </div>
+              
+              <!-- Rider Selection (visible only for Door Delivery) -->
+              <div class="summary-badge-item" id="cartRiderBadge" style="display: none;">
+                <span class="badge-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+                </span>
+                <select id="cartRiderSelect" style="border: none; outline: none; background: none; font-size: 11.5px; font-weight: 600; cursor: pointer; color: var(--text-main);">
+                  <option value="Amit (Rider-1)">Rider-1 (Amit)</option>
+                  <option value="Rahul (Rider-2)">Rider-2 (Rahul)</option>
+                  <option value="Sachin (Rider-3)">Rider-3 (Sachin)</option>
+                </select>
+              </div>
+
+              <div class="summary-badge-item">
+                <span class="badge-icon">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </span>
+              </div>
+              <div class="summary-badge-item date-time-stamp" id="cartDateTimeStamp">
+                <!-- Live Date and Time -->
+                22-12-2022 15:07
+              </div>
+            </div>
+
+            <!-- Cart Table Items List -->
+            <div class="cart-items-table-wrapper">
+              <table class="cart-table" id="cartTable">
+                <thead>
+                  <tr>
+                    <th style="width: 35%;">Item Name</th>
+                    <th style="width: 20%; text-align: center;">Quantity</th>
+                    <th style="width: 15%; text-align: right;">Unit Price</th>
+                    <th style="width: 18%; text-align: right;">Total price</th>
+                    <th style="width: 12%; text-align: center;">Remark</th>
+                  </tr>
+                </thead>
+                <tbody id="cartTableBody">
+                  <!-- Cart list item rows with customizations / edits -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Total Amount Bar -->
+            <div class="cart-totals-section">
+              <div class="total-amount-row">
+                <span class="total-label">Total Amount(Rs.)</span>
+                <span class="total-value" id="cartTotalAmountVal">0.00/-</span>
+              </div>
+            </div>
+
+            <!-- Cart Action Buttons Footer -->
+            <div class="cart-actions-footer">
+              <button class="cart-action-btn success-outline" id="btnSaveKOT">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                SAVE KOT
+              </button>
+              <button class="cart-action-btn success-outline" id="btnSavePrintKOT">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                SAVE & PRINT KOT
+              </button>
+              <button class="cart-action-btn primary-outline" id="btnPrintViewBill">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                PRINT/VIEW BILL
+              </button>
+              <button class="cart-action-btn danger-outline" id="btnCancelItems">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                CANCEL ITEMS
+              </button>
+              <button class="cart-action-btn secondary-outline" id="btnReprint">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                REPRINT
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: PENDING ORDERS ==================== -->
+      <section class="viewport-section" id="viewPendingOrders">
+        <div class="pending-orders-container">
+          <!-- Pending Order Sync Alert Note -->
+          <div class="sync-orders-header">
+            <span class="note-text"><span class="highlight">*Note:</span> Use SYNC ORDERS Button If orders showing completed,but still showing in Pending orders List</span>
+            <button class="sync-orders-btn" id="btnSyncOrders">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              SYNC ORDERS
+            </button>
+          </div>
+
+          <!-- Entries Count and Search Bar -->
+          <div class="table-utility-row">
+            <div class="show-entries">
+              Show 
+              <select id="entriesLimitSelect">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select> 
+              entries
+            </div>
+            <div class="table-search">
+              Search: <input type="text" id="pendingOrdersSearch">
+            </div>
+          </div>
+
+          <!-- Pending Orders Data Table -->
+          <div class="data-table-wrapper">
+            <table class="data-table" id="pendingOrdersTable">
+              <thead>
+                <tr>
+                  <th style="width: 5%;">Payment Status</th>
+                  <th style="width: 10%;">Order Id</th>
+                  <th style="width: 15%;">Date & Time</th>
+                  <th style="width: 10%;">Table No</th>
+                  <th style="width: 8%;">Rider</th>
+                  <th style="width: 10%;">Customer</th>
+                  <th style="width: 8%;">Table Status</th>
+                  <th style="width: 9%; text-align: right;">Total Amount (₹)</th>
+                  <th style="width: 7%; text-align: right;">Discount (%)</th>
+                  <th style="width: 8%; text-align: right;">Total GST</th>
+                  <th style="width: 8%; text-align: right;">Charges (%)</th>
+                  <th style="width: 10%; text-align: right;">Total Paid Amount(₹)</th>
+                  <th style="width: 10%; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="pendingOrdersTableBody">
+                <!-- Dynamically populated open orders -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="table-pagination-row">
+            <span class="pagination-info" id="pendingTableInfo">Showing 1 to 2 of 2 entries</span>
+            <div class="pagination-controls">
+              <button class="pag-btn" id="pendingPrevBtn">Previous</button>
+              <span class="pag-number active" id="pendingCurrentPage">1</span>
+              <button class="pag-btn" id="pendingNextBtn">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: ONLINE ORDERS ==================== -->
+      <section class="viewport-section" id="viewOnlineOrders">
+        <div class="online-orders-container">
+          <!-- Top Controls Header -->
+          <div class="online-orders-controls">
+            <div class="auto-accept-wrapper">
+              <label class="switch-container">
+                <input type="checkbox" id="onlineAutoAcceptToggle">
+                <span class="slider"></span>
+              </label>
+              <span class="auto-accept-label" id="onlineAutoAcceptLabel">Disable Auto-Accepted</span>
+            </div>
+            
+            <button class="token-update-btn" id="btnOnlineTokenUpdate">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+              Token Update
+            </button>
+          </div>
+
+          <!-- Filter Sub-Tabs -->
+          <div class="online-tabs-bar" id="onlineTabsBar">
+            <button class="online-tab active" data-status="PLACED">PLACED</button>
+            <button class="online-tab" data-status="IN">IN</button>
+            <button class="online-tab" data-status="COMPLETED">COMPLETED</button>
+            <button class="online-tab" data-status="CANCELLED">CANCELLED</button>
+            <button class="online-tab" data-status="INFUTURE">INFUTURE</button>
+          </div>
+
+          <!-- Main Table / Grid Area -->
+          <div class="online-table-wrapper" id="onlineTableWrapper">
+            <table class="data-table" id="onlineOrdersTable">
+              <thead>
+                <tr>
+                  <th style="width: 15%;">Order Id</th>
+                  <th style="width: 20%;">Placed At</th>
+                  <th style="width: 20%;">Delivery Time</th>
+                  <th style="width: 15%;">Channel Name</th>
+                  <th style="width: 15%;">Order Status</th>
+                  <th style="width: 15%; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="onlineOrdersTableBody">
+                <!-- Dynamically populated online orders -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Chef Placeholder Layout (when no orders) -->
+          <div class="chef-placeholder" id="onlineChefPlaceholder" style="display: none;">
+            <div class="chef-graphic-circle">
+              <!-- Chef cooking SVG illustration -->
+              <svg viewBox="0 0 200 200" width="150" height="150" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chef-svg">
+                <!-- Outer circle -->
+                <circle cx="100" cy="100" r="85" stroke-dasharray="8 6" class="circle-dotted" stroke="rgba(0,0,0,0.1)"></circle>
+                <!-- Chef head / hat -->
+                <path d="M 80 115 A 15 15 0 0 1 120 115 Z" fill="#cfd8dc" stroke="var(--text-main)"></path>
+                <path d="M 80 115 Q 70 85 90 85 Q 100 70 110 85 Q 130 85 120 115 Z" fill="#ffffff" stroke="var(--text-main)"></path>
+                <!-- Face outline -->
+                <circle cx="100" cy="122" r="10" fill="#ffe0b2" stroke="var(--text-main)"></circle>
+                <path d="M 98 123 Q 100 126 102 123" stroke="var(--text-main)"></path> <!-- Smile -->
+                <!-- Chef collar/jacket -->
+                <path d="M 75 145 C 80 135 90 132 100 132 C 110 132 120 135 125 145 Z" fill="#ffffff" stroke="var(--text-main)"></path>
+                <!-- Buttons on jacket -->
+                <circle cx="97" cy="138" r="1.5" fill="var(--text-main)"></circle>
+                <circle cx="103" cy="138" r="1.5" fill="var(--text-main)"></circle>
+                <!-- Cooking pan -->
+                <path d="M 115 140 H 155" stroke="var(--text-main)" stroke-width="3"></path> <!-- Pan handle -->
+                <path d="M 115 130 H 145 A 5 5 0 0 1 150 135 V 140 H 110 V 135 A 5 5 0 0 1 115 130 Z" fill="#37474f" stroke="var(--text-main)"></path>
+                <!-- Steam lines -->
+                <path d="M 122 120 Q 120 112 124 105" stroke="var(--primary-light)" stroke-width="2"></path>
+                <path d="M 132 118 Q 130 110 134 103" stroke="var(--primary-light)" stroke-width="2"></path>
+                <path d="M 142 122 Q 140 114 144 107" stroke="var(--primary-light)" stroke-width="2"></path>
+              </svg>
+            </div>
+            <div class="chef-text">No orders found in this section</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: SALES SUMMARY / DASHBOARD ==================== -->
+      <section class="viewport-section" id="viewSalesSummary">
+        <div class="sales-summary-container">
+          
+          <!-- Stat Cards Row -->
+          <div class="stats-cards-grid">
+            <div class="stat-card red-line">
+              <div class="stat-title">Monthly Order Placed</div>
+              <div class="stat-value" id="statOrdersPlaced">105</div>
+            </div>
+            <div class="stat-card blue-line">
+              <div class="stat-title">Monthly Revenue</div>
+              <div class="stat-value" id="statRevenue">₹105729/-</div>
+            </div>
+            <div class="stat-card green-line">
+              <div class="stat-title">Monthly Lent Amount</div>
+              <div class="stat-value" id="statLentAmount">₹687/-</div>
+            </div>
+            <div class="stat-card orange-line">
+              <div class="stat-title">Customer Feedback</div>
+              <div class="stat-value" id="statFeedback">0</div>
+            </div>
+          </div>
+
+          <!-- Mid Dashboard Tabs -->
+          <div class="dashboard-tabs-bar">
+            <button class="dash-tab active" data-tab="sales">SALES ANALYSIS</button>
+            <button class="dash-tab" data-tab="payment">PAYMENT ANALYSIS</button>
+            <button class="dash-tab" data-tab="online">ONLINE PAYMENT ANALYSIS</button>
+            <button class="dash-tab" data-tab="graphical">GRAPHICAL ANALYSIS</button>
+          </div>
+
+          <!-- Dashboard Charts & Breakdown Panels -->
+          <div class="dashboard-content-split">
+            <!-- Left Panel: Pie Chart -->
+            <div class="chart-container-card">
+              <div class="card-header">Payment Mode Chart</div>
+              <div class="chart-body" id="paymentChartContainer">
+                <!-- SVG-based dynamic pie chart -->
+              </div>
+            </div>
+
+            <!-- Right Panel: Distribution Table -->
+            <div class="table-container-card">
+              <div class="card-header flex-header">
+                <span>
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="icon-inline"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+                  payment
+                </span>
+              </div>
+              <table class="dashboard-table" id="dashboardPaymentTable">
+                <thead>
+                  <tr>
+                    <th>Payment Mode</th>
+                    <th style="text-align: right;">Quantity(₹)</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardPaymentTableBody">
+                  <!-- Dynamically populated modes (cash, paytm, etc.) -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div> <!-- End App Wrapper -->
+
+
+  <!-- ==================== OVERLAY: BILL SETTLEMENT MODAL ==================== -->
+  <div class="modal-overlay" id="settlementModal">
+    <div class="settlement-modal-container">
+      
+      <!-- Left Panel: Invoice details review -->
+      <div class="settlement-left-pane">
+        <h3 class="pane-title">Bill Items Review</h3>
+        
+        <div class="settlement-items-table-wrapper">
+          <table class="settlement-items-table">
+            <thead>
+              <tr>
+                <th style="text-align: left;">Item Name</th>
+                <th style="text-align: center;">Quantity</th>
+                <th style="text-align: right;">Unit price</th>
+                <th style="text-align: right;">Total price</th>
+                <th style="text-align: center;">Dish Discount</th>
+              </tr>
+            </thead>
+            <tbody id="settlementItemsBody">
+              <!-- Item rows here -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Calculations Table Block -->
+        <div class="settlement-math-block">
+          <div class="math-row">
+            <span class="math-label">Sub-Total :</span>
+            <span class="math-val" id="setSubTotal">0.00</span>
+            <span class="math-label">Bill Amount :</span>
+            <span class="math-val" id="setBillAmount">0.00</span>
+          </div>
+          <div class="math-row">
+            <span class="math-label">no gst (0 %) :</span>
+            <span class="math-val" id="setNoGST">0.00</span>
+            <span class="math-label"></span>
+            <span class="math-val"></span>
+          </div>
+          <div class="math-row">
+            <span class="math-label">CGST (2.5 %) :</span>
+            <span class="math-val" id="setCGST">0.00</span>
+            <span class="math-label"></span>
+            <span class="math-val"></span>
+          </div>
+          <div class="math-row">
+            <span class="math-label">SGST (2.5 %) :</span>
+            <span class="math-val" id="setSGST">0.00</span>
+            <span class="math-label"></span>
+            <span class="math-val"></span>
+          </div>
+          <div class="math-row">
+            <span class="math-label">Discount :</span>
+            <span class="math-val" id="setDiscount">0.00</span>
+            <span class="math-label">Offer :</span>
+            <span class="math-val secondary-text" id="setOffer">(No Offer)</span>
+          </div>
+          <div class="math-row">
+            <span class="math-label">Charges :</span>
+            <span class="math-val" id="setCharges">0.00</span>
+            <span class="math-label">Total :</span>
+            <span class="math-val" id="setTotal">0.00</span>
+          </div>
+          <div class="math-row highlight-grand-total">
+            <span class="math-label">Round Off :</span>
+            <span class="math-val danger-text" id="setRoundOff">0.00</span>
+            <span class="math-label grand-total-label">Grand Total :</span>
+            <span class="math-val grand-total-value" id="setGrandTotal">0.00</span>
+          </div>
+        </div>
+
+        <!-- Extra settlement inputs: Given & Tip Amount -->
+        <div class="settlement-cash-inputs">
+          <div class="input-group">
+            <label for="setGivenAmount">Given Amount:</label>
+            <input type="number" id="setGivenAmount" value="0">
+          </div>
+          <div class="input-group">
+            <label for="setTipAmount">Tip Amount:</label>
+            <input type="number" id="setTipAmount" placeholder="Tip Amount">
+          </div>
+        </div>
+
+        <!-- Payment Modes (Radios) -->
+        <div class="payment-methods-grid">
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="cash" checked>
+            <span class="radio-label">cash</span>
+          </label>
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="card">
+            <span class="radio-label">card</span>
+          </label>
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="paytm">
+            <span class="radio-label">paytm</span>
+          </label>
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="multiple">
+            <span class="radio-label">multiple</span>
+          </label>
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="gpay">
+            <span class="radio-label">G Pay</span>
+          </label>
+          <label class="payment-mode-radio">
+            <input type="radio" name="paymentMode" value="phonepe">
+            <span class="radio-label">PhonePe</span>
+          </label>
+        </div>
+
+        <div class="input-group full-width-input margin-top">
+          <input type="text" placeholder="Payment Remark" id="setPaymentRemark">
+        </div>
+
+        <!-- Overlay Action buttons -->
+        <div class="modal-action-row">
+          <button class="modal-btn btn-success" id="btnSettlePrintBill">PRINT BILL</button>
+          <button class="modal-btn btn-danger" id="btnSettleCloseTable">CLOSE TABLE</button>
+          <button class="modal-btn btn-orange" id="btnSettleSplitBill">SPLIT BILL</button>
+          <button class="modal-btn btn-secondary" id="btnSettleCancel">CLOSE WINDOW</button>
+        </div>
+      </div>
+
+      <!-- Right Panel: Customer Profile Form -->
+      <div class="settlement-right-pane">
+        <h3 class="pane-title">Customer Information</h3>
+        <p class="form-warning-note">
+          <span class="danger-text">*Note:</span> To Save the Customer Details Contact Number is Mandatory.
+        </p>
+
+        <form id="customerDetailsForm" class="customer-details-form" onsubmit="return false;">
+          <div class="form-field">
+            <label for="custName">Customer Name</label>
+            <div class="input-search-wrapper">
+              <input type="text" id="custName" placeholder="Enter Customer Name">
+              <button class="field-icon-btn" id="btnSearchCustomer" type="button" title="Search Existing Customer">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="custNumber" class="label-danger">Customer Number</label>
+            <input type="tel" id="custNumber" placeholder="Enter Contact Number">
+            <span class="form-error-msg" id="custNumberError">Input is not a number!</span>
+          </div>
+
+          <div class="form-field">
+            <label for="custAddress">Customer Address</label>
+            <textarea id="custAddress" rows="2" placeholder="Enter Delivery Address"></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="custGSTIN">Customer GSTIN</label>
+            <input type="text" id="custGSTIN" placeholder="Enter Customer GSTIN">
+          </div>
+
+          <div class="form-row-split">
+            <div class="form-field">
+              <label for="custDOB">Date Of Birth</label>
+              <input type="date" id="custDOB">
+            </div>
+            <div class="form-field">
+              <label for="custAnniversary">Date Of Anniversary</label>
+              <input type="date" id="custAnniversary">
+            </div>
+          </div>
+
+          <!-- Promotions -->
+          <div class="form-field-checkboxes">
+            <label class="checkbox-container">
+              <input type="checkbox" id="checkDiscount">
+              <span class="checkbox-label">Discount</span>
+            </label>
+            <label class="checkbox-container">
+              <input type="checkbox" id="checkCoupon">
+              <span class="checkbox-label">Coupon</span>
+            </label>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ==================== PRINT PREVIEW MODAL DRAWER ==================== -->
+  <div class="print-overlay" id="printReceiptOverlay">
+    <div class="receipt-print-dialog">
+      <!-- Title bar -->
+      <div class="receipt-header-bar no-print">
+        <span>Receipt Print Preview</span>
+        <div class="preview-actions">
+          <button class="preview-btn btn-success" id="btnReceiptPrintTrigger">Print (PDF)</button>
+          <button class="preview-btn btn-secondary" id="btnReceiptPrintClose">Close</button>
+        </div>
+      </div>
+      
+      <!-- Thermal Invoice Paper Page -->
+      <div class="receipt-paper" id="receiptPaper">
+        <!-- Receipt Content rendered via app.js -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==================== REMARK / CUSTOMIZATION EDIT MODAL ==================== -->
+  <div class="modal-overlay" id="remarkModal">
+    <div class="remark-modal-container">
+      <h3>Add Custom Remark</h3>
+      <p id="remarkItemLabel">Item Name</p>
+      
+      <div class="remark-quick-tags">
+        <button class="tag-btn">To Add : 10 inch,onion</button>
+        <button class="tag-btn">Less Spicy</button>
+        <button class="tag-btn">Extra Cheese</button>
+        <button class="tag-btn">No Onion No Garlic</button>
+        <button class="tag-btn">Parcel Pack</button>
+      </div>
+
+      <div class="input-group full-width-input">
+        <input type="text" id="itemRemarkInput" placeholder="Enter item cooking instructions / remarks...">
+      </div>
+
+      <div class="modal-action-row right-align">
+        <button class="modal-btn btn-success" id="btnRemarkSave">Save</button>
+        <button class="modal-btn btn-secondary" id="btnRemarkCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
