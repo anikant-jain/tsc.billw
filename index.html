@@ -1,765 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DigiRestro POS - Premium Restaurant Billing Software</title>
-  <!-- Google Fonts for Modern Premium Typography -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DigiRestro POS</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Outfit',sans-serif;
+    }
+
+    body{
+      background:#f4f7fb;
+      color:#111827;
+    }
+
+    .header{
+      background:#ffffff;
+      padding:18px 30px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 4px 20px rgba(0,0,0,0.06);
+      position:sticky;
+      top:0;
+      z-index:100;
+    }
+
+    .logo{
+      font-size:28px;
+      font-weight:800;
+      color:#dc2626;
+    }
+
+    .header-right{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+
+    .header-btn{
+      padding:10px 18px;
+      border:none;
+      border-radius:12px;
+      background:#111827;
+      color:white;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .main-layout{
+      display:grid;
+      grid-template-columns: 2fr 1fr;
+      gap:20px;
+      padding:20px;
+      height:calc(100vh - 90px);
+    }
+
+    /* LEFT */
+
+    .menu-panel{
+      background:white;
+      border-radius:24px;
+      padding:20px;
+      overflow-y:auto;
+      box-shadow:0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .search-box{
+      width:100%;
+      padding:16px;
+      border:none;
+      background:#f3f4f6;
+      border-radius:14px;
+      margin-bottom:20px;
+      font-size:15px;
+      outline:none;
+    }
+
+    .menu-items-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:18px;
+    }
+
+    .menu-box{
+      background:white;
+      border:1px solid #ededed;
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.05);
+    }
+
+    .menu-box strong{
+      display:block;
+      margin-bottom:18px;
+      font-size:20px;
+      color:#111827;
+    }
+
+    .menu-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:12px 0;
+      border-bottom:1px solid #f1f1f1;
+    }
+
+    .menu-item:last-child{
+      border:none;
+    }
+
+    .menu-item-name{
+      font-size:15px;
+      font-weight:500;
+    }
+
+    .menu-item-price{
+      font-weight:700;
+      color:#dc2626;
+    }
+
+    .add-btn{
+      width:34px;
+      height:34px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(135deg,#ef4444,#dc2626);
+      color:white;
+      font-size:18px;
+      font-weight:bold;
+      cursor:pointer;
+      transition:.3s;
+    }
+
+    .add-btn:hover{
+      transform:scale(1.08);
+    }
+
+    /* RIGHT */
+
+    .cart-panel{
+      background:white;
+      border-radius:24px;
+      padding:20px;
+      display:flex;
+      flex-direction:column;
+      box-shadow:0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    .cart-title{
+      font-size:24px;
+      font-weight:800;
+      margin-bottom:20px;
+    }
+
+    .cart-items{
+      flex:1;
+      overflow-y:auto;
+    }
+
+    .cart-item{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 0;
+      border-bottom:1px solid #f1f1f1;
+    }
+
+    .cart-item-name{
+      font-weight:600;
+    }
+
+    .cart-item-price{
+      font-weight:700;
+      color:#dc2626;
+    }
+
+    .total-box{
+      margin-top:20px;
+      padding:18px;
+      border-radius:18px;
+      background:#111827;
+      color:white;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .action-buttons{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .action-btn{
+      padding:15px;
+      border:none;
+      border-radius:14px;
+      font-weight:700;
+      cursor:pointer;
+      font-size:14px;
+      transition:.3s;
+    }
+
+    .save-btn{
+      background:#16a34a;
+      color:white;
+    }
+
+    .print-btn{
+      background:#2563eb;
+      color:white;
+    }
+
+    .cancel-btn{
+      background:#dc2626;
+      color:white;
+    }
+
+    .clear-btn{
+      background:#111827;
+      color:white;
+    }
+
+    .action-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    @media(max-width:1000px){
+
+      .main-layout{
+        grid-template-columns:1fr;
+        height:auto;
+      }
+
+    }
+
+  </style>
 </head>
 <body>
 
-  <!-- App Wrapper -->
-  <div class="app-container" id="appContainer">
+  <div class="header">
+    <div class="logo">DIGIRESTRO POS</div>
 
-    <!-- Top Navigation Header -->
-    <header class="app-header">
-      <div class="header-left">
-        <button class="icon-btn sidebar-toggle" id="sidebarToggleBtn" aria-label="Toggle Sidebar">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-        <span class="active-title" id="activeViewTitle">DINE IN</span>
-      </div>
-
-      <!-- Main Navigation Tabs -->
-      <nav class="header-tabs">
-        <button class="tab-link active" data-view="dine-in" id="navDineIn">DINE IN</button>
-        <button class="tab-link" data-view="take-away" id="navTakeAway">TAKE AWAY</button>
-        <button class="tab-link" data-view="door-delivery" id="navDoorDelivery">DOOR DELIVERY</button>
-        <button class="tab-link" data-view="online-orders" id="navOnlineOrders">
-          ONLINE ORDERS <span class="badge" id="onlineOrdersBadge">0</span>
-        </button>
-        <button class="tab-link" data-view="pending-orders" id="navPendingOrders">PENDING ORDERS</button>
-      </nav>
-
-      <!-- Right Header Actions -->
-      <div class="header-right">
-        <!-- Online Toggle Switch -->
-        <label class="switch-container">
-          <input type="checkbox" checked id="onlineToggle">
-          <span class="slider"></span>
-        </label>
-        
-        <!-- Connection Status -->
-        <div class="status-indicator online" title="Status: Online" id="statusIndicator">
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="wifi-icon"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20" stroke-linecap="round" stroke-width="4"></line></svg>
-        </div>
-
-        <!-- User Profile Dropdown -->
-        <div class="profile-dropdown" id="profileDropdownBtn">
-          <div class="profile-avatar">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          </div>
-          <span class="username" id="usernameDisplay">Toodo</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </div>
-
-        <!-- Notification Badge -->
-        <button class="icon-btn notification-btn" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-          <span class="notification-badge">2</span>
-        </button>
-
-        <!-- More Option -->
-        <button class="icon-btn more-btn" aria-label="More Settings">
-          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
-        </button>
-      </div>
-    </header>
-
-    <!-- Slide-Out Sidebar Menu Drawer -->
-    <aside class="sidebar-drawer" id="sidebarDrawer">
-      <div class="sidebar-header">
-        <div class="sidebar-brand">
-          <span class="brand-text">DIGIRESTRO</span>
-        </div>
-        <div class="sidebar-license">
-          <span class="license-date">28/02/2029 (2260) days</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" class="license-icon"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-      </div>
-      
-      <nav class="sidebar-menu">
-        <button class="menu-item active" data-target="dine-in" id="menuHome">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          </span>
-          <span class="menu-label">Home</span>
-        </button>
-        <button class="menu-item" data-target="pending-orders" id="menuAllOrder">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          </span>
-          <span class="menu-label">All Order</span>
-        </button>
-        <button class="menu-item" data-target="sales-summary" id="menuSalesSummary">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-          </span>
-          <span class="menu-label">Sales Summary</span>
-        </button>
-        <button class="menu-item" data-target="online-orders" id="menuAggregator">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-          </span>
-          <span class="menu-label">Aggregator</span>
-        </button>
-        <button class="menu-item" data-target="take-away" id="menuTakeAway">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M18.36 18.36L12 12l-6.36 6.36M12 12V3"></path></svg>
-          </span>
-          <span class="menu-label">Take Away</span>
-        </button>
-        <button class="menu-item" data-target="door-delivery" id="menuDoorDelivery">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="12" y1="4" x2="12" y2="20"></line></svg>
-          </span>
-          <span class="menu-label">Door Delivery</span>
-        </button>
-        <button class="menu-item" data-target="dine-in" id="menuDineIn">
-          <span class="menu-icon">
-            <!-- Fork & Spoon -->
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M12 2v20"></path></svg>
-          </span>
-          <span class="menu-label">Dine-in Orders</span>
-        </button>
-        <button class="menu-item" id="menuStatus">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
-          </span>
-          <span class="menu-label">Menu Status</span>
-        </button>
-        <button class="menu-item" id="menuExpense">
-          <span class="menu-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-          </span>
-          <span class="menu-label">Expense</span>
-        </button>
-      </nav>
-    </aside>
-
-    <!-- Main View Workspace Area -->
-    <main class="main-workspace" id="mainWorkspace">
-
-      <!-- ==================== VIEW: DINE IN ==================== -->
-      <section class="viewport-section active" id="viewDineIn">
-        <!-- Area Selector Tabs -->
-        <div class="area-selector-bar">
-          <button class="area-btn active" data-area="ground">GROUND</button>
-          <button class="area-btn" data-area="floor">FLOOR</button>
-          <button class="area-btn" data-area="vip">VIP</button>
-          <button class="area-btn" data-area="garden">GARDEN</button>
-          <button class="area-btn" data-area="ac">AC</button>
-          <button class="area-btn" data-area="bar">BAR</button>
-          <button class="area-btn" data-area="testab">TESTAB</button>
-        </div>
-
-        <!-- Tables Grid Layout -->
-        <div class="tables-grid" id="tablesGrid">
-          <!-- Dynamically populated via app.js -->
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: TAKE AWAY ==================== -->
-      <section class="viewport-section" id="viewTakeAway">
-        <div class="orders-management-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-          <h3 class="view-subtitle" style="font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif;">Active Take Away Orders</h3>
-          <button class="modal-btn btn-success" id="btnNewTakeAway" style="flex: none; padding: 10px 20px; font-size: 13.5px; border-radius: 8px;">
-            + NEW TAKE AWAY ORDER
-          </button>
-        </div>
-        <!-- Active Take Away Orders Grid -->
-        <div class="tables-grid" id="takeAwayGrid">
-          <!-- Dynamically populated via app.js -->
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: DOOR DELIVERY ==================== -->
-      <section class="viewport-section" id="viewDoorDelivery">
-        <div class="orders-management-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-          <h3 class="view-subtitle" style="font-size: 18px; font-weight: 700; font-family: 'Outfit', sans-serif;">Active Door Delivery Orders</h3>
-          <button class="modal-btn btn-success" id="btnNewDoorDelivery" style="flex: none; padding: 10px 20px; font-size: 13.5px; border-radius: 8px;">
-            + NEW DOOR DELIVERY ORDER
-          </button>
-        </div>
-        <!-- Active Door Delivery Orders Grid -->
-        <div class="tables-grid" id="doorDeliveryGrid">
-          <!-- Dynamically populated via app.js -->
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: POS TERMINAL ==================== -->
-      <section class="viewport-section" id="viewPOS">
-        <div class="pos-layout">
-          <!-- Left side: Category, Search and Food Items -->
-          <div class="pos-items-panel">
-            <!-- Search & Filter Bar -->
-            <div class="pos-search-header">
-              <div class="search-input-wrapper">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" placeholder="Search Item Name (Ex: Aloo Gobi), Press ESC To Clear" id="menuSearchInput">
-              </div>
-            </div>
-
-            <div class="pos-main-body">
-              <!-- Menu Categories Left Sidebar -->
-              <div class="categories-list" id="categoriesContainer">
-                <!-- Dynamically populated, items styled with red indicators -->
-              </div>
-
-              <!-- Menu Grid -->
-              <div class="menu-items-grid-container">
-                <div class="menu-items-grid" id="menuItemsGrid">
-                  <!-- Dynamically populated items -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right side: POS Cart / Ticket -->
-          <div class="pos-cart-panel">
-            <!-- Cart Header Badges -->
-            <div class="cart-summary-header">
-              <div class="summary-badge-item text-bold">
-                <span class="badge-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
-                </span>
-                <span id="cartTableLabel">Table : 1</span>
-              </div>
-              <div class="summary-badge-item">
-                <span class="badge-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                </span>
-                <span id="cartServiceLabel">Dine In</span>
-              </div>
-              
-              <!-- Rider Selection (visible only for Door Delivery) -->
-              <div class="summary-badge-item" id="cartRiderBadge" style="display: none;">
-                <span class="badge-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                </span>
-                <select id="cartRiderSelect" style="border: none; outline: none; background: none; font-size: 11.5px; font-weight: 600; cursor: pointer; color: var(--text-main);">
-                  <option value="Amit (Rider-1)">Rider-1 (Amit)</option>
-                  <option value="Rahul (Rider-2)">Rider-2 (Rahul)</option>
-                  <option value="Sachin (Rider-3)">Rider-3 (Sachin)</option>
-                </select>
-              </div>
-
-              <div class="summary-badge-item">
-                <span class="badge-icon">
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                </span>
-              </div>
-              <div class="summary-badge-item date-time-stamp" id="cartDateTimeStamp">
-                <!-- Live Date and Time -->
-                22-12-2022 15:07
-              </div>
-            </div>
-
-            <!-- Cart Table Items List -->
-            <div class="cart-items-table-wrapper">
-              <table class="cart-table" id="cartTable">
-                <thead>
-                  <tr>
-                    <th style="width: 35%;">Item Name</th>
-                    <th style="width: 20%; text-align: center;">Quantity</th>
-                    <th style="width: 15%; text-align: right;">Unit Price</th>
-                    <th style="width: 18%; text-align: right;">Total price</th>
-                    <th style="width: 12%; text-align: center;">Remark</th>
-                  </tr>
-                </thead>
-                <tbody id="cartTableBody">
-                  <!-- Cart list item rows with customizations / edits -->
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Total Amount Bar -->
-            <div class="cart-totals-section">
-              <div class="total-amount-row">
-                <span class="total-label">Total Amount(Rs.)</span>
-                <span class="total-value" id="cartTotalAmountVal">0.00/-</span>
-              </div>
-            </div>
-
-            <!-- Cart Action Buttons Footer -->
-            <div class="cart-actions-footer">
-              <button class="cart-action-btn success-outline" id="btnSaveKOT">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                SAVE KOT
-              </button>
-              <button class="cart-action-btn success-outline" id="btnSavePrintKOT">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                SAVE & PRINT KOT
-              </button>
-              <button class="cart-action-btn primary-outline" id="btnPrintViewBill">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                PRINT/VIEW BILL
-              </button>
-              <button class="cart-action-btn danger-outline" id="btnCancelItems">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                CANCEL ITEMS
-              </button>
-              <button class="cart-action-btn secondary-outline" id="btnReprint">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                REPRINT
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: PENDING ORDERS ==================== -->
-      <section class="viewport-section" id="viewPendingOrders">
-        <div class="pending-orders-container">
-          <!-- Pending Order Sync Alert Note -->
-          <div class="sync-orders-header">
-            <span class="note-text"><span class="highlight">*Note:</span> Use SYNC ORDERS Button If orders showing completed,but still showing in Pending orders List</span>
-            <button class="sync-orders-btn" id="btnSyncOrders">
-              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-              SYNC ORDERS
-            </button>
-          </div>
-
-          <!-- Entries Count and Search Bar -->
-          <div class="table-utility-row">
-            <div class="show-entries">
-              Show 
-              <select id="entriesLimitSelect">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select> 
-              entries
-            </div>
-            <div class="table-search">
-              Search: <input type="text" id="pendingOrdersSearch">
-            </div>
-          </div>
-
-          <!-- Pending Orders Data Table -->
-          <div class="data-table-wrapper">
-            <table class="data-table" id="pendingOrdersTable">
-              <thead>
-                <tr>
-                  <th style="width: 5%;">Payment Status</th>
-                  <th style="width: 10%;">Order Id</th>
-                  <th style="width: 15%;">Date & Time</th>
-                  <th style="width: 10%;">Table No</th>
-                  <th style="width: 8%;">Rider</th>
-                  <th style="width: 10%;">Customer</th>
-                  <th style="width: 8%;">Table Status</th>
-                  <th style="width: 9%; text-align: right;">Total Amount (₹)</th>
-                  <th style="width: 7%; text-align: right;">Discount (%)</th>
-                  <th style="width: 8%; text-align: right;">Total GST</th>
-                  <th style="width: 8%; text-align: right;">Charges (%)</th>
-                  <th style="width: 10%; text-align: right;">Total Paid Amount(₹)</th>
-                  <th style="width: 10%; text-align: center;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="pendingOrdersTableBody">
-                <!-- Dynamically populated open orders -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination Footer -->
-          <div class="table-pagination-row">
-            <span class="pagination-info" id="pendingTableInfo">Showing 1 to 2 of 2 entries</span>
-            <div class="pagination-controls">
-              <button class="pag-btn" id="pendingPrevBtn">Previous</button>
-              <span class="pag-number active" id="pendingCurrentPage">1</span>
-              <button class="pag-btn" id="pendingNextBtn">Next</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: ONLINE ORDERS ==================== -->
-      <section class="viewport-section" id="viewOnlineOrders">
-        <div class="online-orders-container">
-          <!-- Top Controls Header -->
-          <div class="online-orders-controls">
-            <div class="auto-accept-wrapper">
-              <label class="switch-container">
-                <input type="checkbox" id="onlineAutoAcceptToggle">
-                <span class="slider"></span>
-              </label>
-              <span class="auto-accept-label" id="onlineAutoAcceptLabel">Disable Auto-Accepted</span>
-            </div>
-            
-            <button class="token-update-btn" id="btnOnlineTokenUpdate">
-              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-              Token Update
-            </button>
-          </div>
-
-          <!-- Filter Sub-Tabs -->
-          <div class="online-tabs-bar" id="onlineTabsBar">
-            <button class="online-tab active" data-status="PLACED">PLACED</button>
-            <button class="online-tab" data-status="IN">IN</button>
-            <button class="online-tab" data-status="COMPLETED">COMPLETED</button>
-            <button class="online-tab" data-status="CANCELLED">CANCELLED</button>
-            <button class="online-tab" data-status="INFUTURE">INFUTURE</button>
-          </div>
-
-          <!-- Main Table / Grid Area -->
-          <div class="online-table-wrapper" id="onlineTableWrapper">
-            <table class="data-table" id="onlineOrdersTable">
-              <thead>
-                <tr>
-                  <th style="width: 15%;">Order Id</th>
-                  <th style="width: 20%;">Placed At</th>
-                  <th style="width: 20%;">Delivery Time</th>
-                  <th style="width: 15%;">Channel Name</th>
-                  <th style="width: 15%;">Order Status</th>
-                  <th style="width: 15%; text-align: center;">Action</th>
-                </tr>
-              </thead>
-              <tbody id="onlineOrdersTableBody">
-                <!-- Dynamically populated online orders -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Chef Placeholder Layout (when no orders) -->
-          <div class="chef-placeholder" id="onlineChefPlaceholder" style="display: none;">
-            <div class="chef-graphic-circle">
-              <!-- Chef cooking SVG illustration -->
-              <svg viewBox="0 0 200 200" width="150" height="150" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chef-svg">
-                <!-- Outer circle -->
-                <circle cx="100" cy="100" r="85" stroke-dasharray="8 6" class="circle-dotted" stroke="rgba(0,0,0,0.1)"></circle>
-                <!-- Chef head / hat -->
-                <path d="M 80 115 A 15 15 0 0 1 120 115 Z" fill="#cfd8dc" stroke="var(--text-main)"></path>
-                <path d="M 80 115 Q 70 85 90 85 Q 100 70 110 85 Q 130 85 120 115 Z" fill="#ffffff" stroke="var(--text-main)"></path>
-                <!-- Face outline -->
-                <circle cx="100" cy="122" r="10" fill="#ffe0b2" stroke="var(--text-main)"></circle>
-                <path d="M 98 123 Q 100 126 102 123" stroke="var(--text-main)"></path> <!-- Smile -->
-                <!-- Chef collar/jacket -->
-                <path d="M 75 145 C 80 135 90 132 100 132 C 110 132 120 135 125 145 Z" fill="#ffffff" stroke="var(--text-main)"></path>
-                <!-- Buttons on jacket -->
-                <circle cx="97" cy="138" r="1.5" fill="var(--text-main)"></circle>
-                <circle cx="103" cy="138" r="1.5" fill="var(--text-main)"></circle>
-                <!-- Cooking pan -->
-                <path d="M 115 140 H 155" stroke="var(--text-main)" stroke-width="3"></path> <!-- Pan handle -->
-                <path d="M 115 130 H 145 A 5 5 0 0 1 150 135 V 140 H 110 V 135 A 5 5 0 0 1 115 130 Z" fill="#37474f" stroke="var(--text-main)"></path>
-                <!-- Steam lines -->
-                <path d="M 122 120 Q 120 112 124 105" stroke="var(--primary-light)" stroke-width="2"></path>
-                <path d="M 132 118 Q 130 110 134 103" stroke="var(--primary-light)" stroke-width="2"></path>
-                <path d="M 142 122 Q 140 114 144 107" stroke="var(--primary-light)" stroke-width="2"></path>
-              </svg>
-            </div>
-            <div class="chef-text">No orders found in this section</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ==================== VIEW: SALES SUMMARY / DASHBOARD ==================== -->
-      <section class="viewport-section" id="viewSalesSummary">
-        <div class="sales-summary-container">
-          
-          <!-- Stat Cards Row -->
-          <div class="stats-cards-grid">
-            <div class="stat-card red-line">
-              <div class="stat-title">Monthly Order Placed</div>
-              <div class="stat-value" id="statOrdersPlaced">105</div>
-            </div>
-            <div class="stat-card blue-line">
-              <div class="stat-title">Monthly Revenue</div>
-              <div class="stat-value" id="statRevenue">₹105729/-</div>
-            </div>
-            <div class="stat-card green-line">
-              <div class="stat-title">Monthly Lent Amount</div>
-              <div class="stat-value" id="statLentAmount">₹687/-</div>
-            </div>
-            <div class="stat-card orange-line">
-              <div class="stat-title">Customer Feedback</div>
-              <div class="stat-value" id="statFeedback">0</div>
-            </div>
-          </div>
-
-          <!-- Mid Dashboard Tabs -->
-          <div class="dashboard-tabs-bar">
-            <button class="dash-tab active" data-tab="sales">SALES ANALYSIS</button>
-            <button class="dash-tab" data-tab="payment">PAYMENT ANALYSIS</button>
-            <button class="dash-tab" data-tab="online">ONLINE PAYMENT ANALYSIS</button>
-            <button class="dash-tab" data-tab="graphical">GRAPHICAL ANALYSIS</button>
-          </div>
-
-          <!-- Dashboard Charts & Breakdown Panels -->
-          <div class="dashboard-content-split">
-            <!-- Left Panel: Pie Chart -->
-            <div class="chart-container-card">
-              <div class="card-header">Payment Mode Chart</div>
-              <div class="chart-body" id="paymentChartContainer">
-                <!-- SVG-based dynamic pie chart -->
-              </div>
-            </div>
-
-            <!-- Right Panel: Distribution Table -->
-            <div class="table-container-card">
-              <div class="card-header flex-header">
-                <span>
-                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.2" fill="none" class="icon-inline"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-                  payment
-                </span>
-              </div>
-              <table class="dashboard-table" id="dashboardPaymentTable">
-                <thead>
-                  <tr>
-                    <th>Payment Mode</th>
-                    <th style="text-align: right;">Quantity(₹)</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboardPaymentTableBody">
-                  <!-- Dynamically populated modes (cash, paytm, etc.) -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-
-  </div> <!-- End App Wrapper -->
-
-
-  <!-- ==================== OVERLAY: BILL SETTLEMENT MODAL ==================== -->
-  <div class="modal-overlay" id="settlementModal">
-    <div class="settlement-modal-container">
-      
-      <!-- Left Panel: Invoice details review -->
-      <div class="settlement-left-pane">
-        <h3 class="pane-title">Bill Items Review</h3>
-        
-        <div class="settlement-items-table-wrapper">
-          <table class="settlement-items-table">
-            <thead>
-              <tr>
-                <th style="text-align: left;">Item Name</th>
-                <th style="text-align: center;">Quantity</th>
-                <th style="text-align: right;">Unit price</th>
-                <th style="text-align: right;">Total price</th>
-                <th style="text-align: center;">Dish Discount</th>
-              </tr>
-            </thead>
-            <tbody id="settlementItemsBody">
-              <!-- Item rows here -->
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Calculations Table Block -->
-        <div class="settlement-math-block">
-          <div class="math-row">
-            <span class="math-label">Sub-Total :</span>
-            <span class="math-val" id="setSubTotal">0.00</span>
-            <span class="math-label">Bill Amount :</span>
-            <span class="math-val" id="setBillAmount">0.00</span>
-          </div>
-          <div class="math-row">
-            <span class="math-label">no gst (0 %) :</span>
-            <span class="math-val" id="setNoGST">0.00</span>
-            <span class="math-label"></span>
-            <span class="math-val"></span>
-          </div>
-          <div class="math-row">
-            <span class="math-label">CGST (2.5 %) :</span>
-            <span class="math-val" id="setCGST">0.00</span>
-            <span class="math-label"></span>
-            <span class="math-val"></span>
-          </div>
-          <div class="math-row">
-            <span class="math-label">SGST (2.5 %) :</span>
-            <span class="math-val" id="setSGST">0.00</span>
-            <span class="math-label"></span>
-            <span class="math-val"></span>
-          </div>
-          <div class="math-row">
-            <span class="math-label">Discount :</span>
-            <span class="math-val" id="setDiscount">0.00</span>
-            <span class="math-label">Offer :</span>
-            <span class="math-val secondary-text" id="setOffer">(No Offer)</span>
-          </div>
-          <div class="math-row">
-            <span class="math-label">Charges :</span>
-            <span class="math-val" id="setCharges">0.00</span>
-            <span class="math-label">Total :</span>
-            <span class="math-val" id="setTotal">0.00</span>
-          </div>
-          <div class="math-row highlight-grand-total">
-            <span class="math-label">Round Off :</span>
-            <span class="math-val danger-text" id="setRoundOff">0.00</span>
-            <span class="math-label grand-total-label">Grand Total :</span>
-            <span class="math-val grand-total-value" id="setGrandTotal">0.00</span>
-          </div>
-        </div>
-
-        <!-- Extra settlement inputs: Given & Tip Amount -->
-        <div class="settlement-cash-inputs">
-          <div class="input-group">
-            <label for="setGivenAmount">Given Amount:</label>
-            <input type="number" id="setGivenAmount" value="0">
-          </div>
-          <div class="input-group">
-            <label for="setTipAmount">Tip Amount:</label>
-            <input type="number" id="setTipAmount" placeholder="Tip Amount">
-          </div>
-        </div>
-
-        <!-- Payment Modes (Radios) -->
-        <div class="payment-methods-grid">
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="cash" checked>
-            <span class="radio-label">cash</span>
-          </label>
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="card">
-            <span class="radio-label">card</span>
-          </label>
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="paytm">
-            <span class="radio-label">paytm</span>
-          </label>
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="multiple">
-            <span class="radio-label">multiple</span>
-          </label>
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="gpay">
-            <span class="radio-label">G Pay</span>
-          </label>
-          <label class="payment-mode-radio">
-            <input type="radio" name="paymentMode" value="phonepe">
-            <span class="radio-label">PhonePe</span>
-          </label>
-        </div>
-
-        <div class="input-group full-width-input margin-top">
-          <input type="text" placeholder="Payment Remark" id="setPaymentRemark">
-        </div>
-
-        <!-- Overlay Action buttons -->
-        <div class="modal-action-row">
-          <button class="modal-btn btn-success" id="btnSettlePrintBill">PRINT BILL</button>
-          <button class="modal-btn btn-danger" id="btnSettleCloseTable">CLOSE TABLE</button>
-          <button class="modal-btn btn-orange" id="btnSettleSplitBill">SPLIT BILL</button>
-          <button class="modal-btn btn-secondary" id="btnSettleCancel">CLOSE WINDOW</button>
-        </div>
-      </div>
-
-      <!-- Right Panel: Customer Profile Form -->
-      <div class="settlement-right-pane">
-        <h3 class="pane-title">Customer Information</h3>
-        <p class="form-warning-note">
-          <span class="danger-text">*Note:</span> To Save the Customer Details Contact Number is Mandatory.
-        </p>
-
-        <form id="customerDetailsForm" class="customer-details-form" onsubmit="return false;">
-          <div class="form-field">
-            <label for="custName">Customer Name</label>
-            <div class="input-search-wrapper">
-              <input type="text" id="custName" placeholder="Enter Customer Name">
-              <button class="field-icon-btn" id="btnSearchCustomer" type="button" title="Search Existing Customer">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="form-field">
-            <label for="custNumber" class="label-danger">Customer Number</label>
-            <input type="tel" id="custNumber" placeholder="Enter Contact Number">
-            <span class="form-error-msg" id="custNumberError">Input is not a number!</span>
-          </div>
-
-          <div class="form-field">
-            <label for="custAddress">Customer Address</label>
-            <textarea id="custAddress" rows="2" placeholder="Enter Delivery Address"></textarea>
-          </div>
-
-          <div class="form-field">
-            <label for="custGSTIN">Customer GSTIN</label>
-            <input type="text" id="custGSTIN" placeholder="Enter Customer GSTIN">
-          </div>
-
-          <div class="form-row-split">
-            <div class="form-field">
-              <label for="custDOB">Date Of Birth</label>
-              <input type="date" id="custDOB">
-            </div>
-            <div class="form-field">
-              <label for="custAnniversary">Date Of Anniversary</label>
-              <input type="date" id="custAnniversary">
-            </div>
-          </div>
-
-          <!-- Promotions -->
-          <div class="form-field-checkboxes">
-            <label class="checkbox-container">
-              <input type="checkbox" id="checkDiscount">
-              <span class="checkbox-label">Discount</span>
-            </label>
-            <label class="checkbox-container">
-              <input type="checkbox" id="checkCoupon">
-              <span class="checkbox-label">Coupon</span>
-            </label>
-          </div>
-        </form>
-      </div>
-
+    <div class="header-right">
+      <button class="header-btn">DINE IN</button>
+      <button class="header-btn">TAKE AWAY</button>
+      <button class="header-btn">DELIVERY</button>
     </div>
   </div>
 
+  <div class="main-layout">
 
-  <!-- ==================== PRINT PREVIEW MODAL DRAWER ==================== -->
-  <div class="print-overlay" id="printReceiptOverlay">
-    <div class="receipt-print-dialog">
-      <!-- Title bar -->
-      <div class="receipt-header-bar no-print">
-        <span>Receipt Print Preview</span>
-        <div class="preview-actions">
-          <button class="preview-btn btn-success" id="btnReceiptPrintTrigger">Print (PDF)</button>
-          <button class="preview-btn btn-secondary" id="btnReceiptPrintClose">Close</button>
+    <!-- LEFT -->
+    <div class="menu-panel">
+
+      <input
+        type="text"
+        class="search-box"
+        placeholder="Search menu item..."
+        id="searchInput"
+      >
+
+      <div class="menu-items-grid" id="menuContainer">
+
+        <!-- Sandwich -->
+        <div class="menu-box">
+          <strong>🥪 Sandwich</strong>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Masala Sandwich</span>
+            <span class="menu-item-price">₹70</span>
+            <button class="add-btn" onclick="addToCart('Masala Sandwich',70)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Veg Sandwich</span>
+            <span class="menu-item-price">₹80</span>
+            <button class="add-btn" onclick="addToCart('Veg Sandwich',80)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Cheese Chutney</span>
+            <span class="menu-item-price">₹80</span>
+            <button class="add-btn" onclick="addToCart('Cheese Chutney',80)">+</button>
+          </div>
+
         </div>
+
+        <!-- Pizza -->
+        <div class="menu-box">
+
+          <strong>🍕 Pizza</strong>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Margareta Pizza</span>
+            <span class="menu-item-price">₹99</span>
+            <button class="add-btn" onclick="addToCart('Margareta Pizza',99)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Golden Corn Pizza</span>
+            <span class="menu-item-price">₹140</span>
+            <button class="add-btn" onclick="addToCart('Golden Corn Pizza',140)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Tandoori Paneer Pizza</span>
+            <span class="menu-item-price">₹150</span>
+            <button class="add-btn" onclick="addToCart('Tandoori Paneer Pizza',150)">+</button>
+          </div>
+
+        </div>
+
+        <!-- Burger -->
+        <div class="menu-box">
+
+          <strong>🍔 Burger</strong>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Veg Burger</span>
+            <span class="menu-item-price">₹80</span>
+            <button class="add-btn" onclick="addToCart('Veg Burger',80)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Cheese Burger</span>
+            <span class="menu-item-price">₹90</span>
+            <button class="add-btn" onclick="addToCart('Cheese Burger',90)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Double Decker Burger</span>
+            <span class="menu-item-price">₹140</span>
+            <button class="add-btn" onclick="addToCart('Double Decker Burger',140)">+</button>
+          </div>
+
+        </div>
+
+        <!-- Shakes -->
+        <div class="menu-box">
+
+          <strong>🥤 Shakes</strong>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Vanilla Shake</span>
+            <span class="menu-item-price">₹80</span>
+            <button class="add-btn" onclick="addToCart('Vanilla Shake',80)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Chocolate Shake</span>
+            <span class="menu-item-price">₹90</span>
+            <button class="add-btn" onclick="addToCart('Chocolate Shake',90)">+</button>
+          </div>
+
+          <div class="menu-item">
+            <span class="menu-item-name">Kit Kat Shake</span>
+            <span class="menu-item-price">₹100</span>
+            <button class="add-btn" onclick="addToCart('Kit Kat Shake',100)">+</button>
+          </div>
+
+        </div>
+
       </div>
-      
-      <!-- Thermal Invoice Paper Page -->
-      <div class="receipt-paper" id="receiptPaper">
-        <!-- Receipt Content rendered via app.js -->
-      </div>
+
     </div>
+
+    <!-- RIGHT -->
+    <div class="cart-panel">
+
+      <div class="cart-title">
+        🛒 Current Order
+      </div>
+
+      <div class="cart-items" id="cartItems"></div>
+
+      <div class="total-box">
+        <span>Total</span>
+        <span id="totalAmount">₹0</span>
+      </div>
+
+      <div class="action-buttons">
+
+        <button class="action-btn save-btn">
+          SAVE KOT
+        </button>
+
+        <button class="action-btn print-btn">
+          PRINT BILL
+        </button>
+
+        <button class="action-btn cancel-btn" onclick="clearCart()">
+          CLEAR
+        </button>
+
+        <button class="action-btn clear-btn">
+          PAYMENT
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
 
+  <script>
 
-  <!-- ==================== REMARK / CUSTOMIZATION EDIT MODAL ==================== -->
-  <div class="modal-overlay" id="remarkModal">
-    <div class="remark-modal-container">
-      <h3>Add Custom Remark</h3>
-      <p id="remarkItemLabel">Item Name</p>
-      
-      <div class="remark-quick-tags">
-        <button class="tag-btn">To Add : 10 inch,onion</button>
-        <button class="tag-btn">Less Spicy</button>
-        <button class="tag-btn">Extra Cheese</button>
-        <button class="tag-btn">No Onion No Garlic</button>
-        <button class="tag-btn">Parcel Pack</button>
-      </div>
+    let cart = [];
+    let total = 0;
 
-      <div class="input-group full-width-input">
-        <input type="text" id="itemRemarkInput" placeholder="Enter item cooking instructions / remarks...">
-      </div>
+    function addToCart(name,price){
 
-      <div class="modal-action-row right-align">
-        <button class="modal-btn btn-success" id="btnRemarkSave">Save</button>
-        <button class="modal-btn btn-secondary" id="btnRemarkCancel">Cancel</button>
-      </div>
-    </div>
-  </div>
+      cart.push({
+        name,
+        price
+      });
 
-  <script src="app.js"></script>
+      total += price;
+
+      renderCart();
+
+    }
+
+    function renderCart(){
+
+      const cartItems = document.getElementById("cartItems");
+
+      cartItems.innerHTML = "";
+
+      cart.forEach((item,index)=>{
+
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <div>
+              <div class="cart-item-name">${item.name}</div>
+            </div>
+
+            <div class="cart-item-price">
+              ₹${item.price}
+            </div>
+          </div>
+        `;
+
+      });
+
+      document.getElementById("totalAmount").innerText =
+        `₹${total}`;
+
+    }
+
+    function clearCart(){
+
+      cart = [];
+      total = 0;
+
+      renderCart();
+
+    }
+
+    // SEARCH
+
+    document
+      .getElementById("searchInput")
+      .addEventListener("keyup",function(){
+
+      let value = this.value.toLowerCase();
+
+      let items =
+        document.querySelectorAll(".menu-item");
+
+      items.forEach(item=>{
+
+        let text =
+          item.innerText.toLowerCase();
+
+        item.style.display =
+          text.includes(value)
+          ? "flex"
+          : "none";
+
+      });
+
+    });
+
+  </script>
+
 </body>
 </html>
